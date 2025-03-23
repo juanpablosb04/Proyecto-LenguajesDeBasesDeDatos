@@ -38,18 +38,22 @@ CREATE SEQUENCE miembros_seq
 START WITH 1
 INCREMENT BY 1;
 
+select * from miembros;
+
 CREATE TABLE instructores (
     id_instructor INT PRIMARY KEY,
     nombre VARCHAR2(100),
     especialidad VARCHAR2(100),
     telefono VARCHAR2(20),
     correo VARCHAR2(100),
-    salario DECIMAL(10,2)
+    salario NUMBER(10, 2) NOT NULL
 );
 
 CREATE SEQUENCE instructores_seq
 START WITH 1
 INCREMENT BY 1;
+
+select * from instructores;
 
 CREATE TABLE clases (
     id_clase INT PRIMARY KEY,
@@ -63,6 +67,8 @@ CREATE SEQUENCE clases_seq
 START WITH 1
 INCREMENT BY 1;
 
+select * from clases;
+
 CREATE TABLE sucursales (
     id_gimnasio INT PRIMARY KEY,
     nombre_sucursal VARCHAR2(100),
@@ -70,6 +76,12 @@ CREATE TABLE sucursales (
     telefono VARCHAR2(20),
     ciudad VARCHAR2(100)
 );
+
+CREATE SEQUENCE sucursales_seq
+START WITH 1
+INCREMENT BY 1;
+
+select * from sucursales;
 
 CREATE TABLE equipos_gimnasio (
     id_equipo INT PRIMARY KEY,
@@ -84,6 +96,8 @@ CREATE TABLE equipos_gimnasio (
 CREATE SEQUENCE equipos_gimnasio_seq
 START WITH 1
 INCREMENT BY 1;
+
+select * from equipos_gimnasio;
 
 CREATE TABLE mantenimiento_equipos (
     id_mantenimiento INT PRIMARY KEY,
@@ -101,7 +115,7 @@ INCREMENT BY 1;
 CREATE TABLE productos_tienda (
     id_producto INT PRIMARY KEY,
     nombre_producto VARCHAR2(100),
-    precio DECIMAL(10,2),
+    precio NUMBER(10,2),
     stock INT,
     tipo_producto VARCHAR2(100)
 );
@@ -109,6 +123,8 @@ CREATE TABLE productos_tienda (
 CREATE SEQUENCE productos_tienda_seq
 START WITH 1
 INCREMENT BY 1;
+
+select * from productos_tienda;
 
 CREATE TABLE ventas_tienda (
     id_venta INT PRIMARY KEY,

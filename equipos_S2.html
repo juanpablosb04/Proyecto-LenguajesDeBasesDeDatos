@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla de Inicio</title>
+  <link rel="stylesheet" href="/estilos/inicio.css"> 
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="equipos_S2.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-[#242424] p-4">
+
+    <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+      <div class="text-white text-xl font-bold">
+        <a>Gym-Nordico</a>
+      </div>
+      <div class="space-x-4">
+        <a href="/clientes.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clientes</a>
+            <a href="/membresias.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Membresias</a>
+            <a href="/instructores.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Entrenadores</a>
+            <a href="/clases.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clases</a>
+            <a href="/productos.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Productos</a>
+            <a href="/equipos_gimnasio.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Equipos</a>
+            <a href="/backend/logout.php" class="text-[#ff6600] hover:bg-white hover:text-[#242424] px-4 py-2 rounded-md transition">Logout</a>
+    </div>    
+    </div>
+  </nav>
+
+<div class="max-w-5xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-2xl">
+    <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Lista de Equipos de la Sucursal #1</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gradient-to-r from-[#ff6600] to-[#1b1c30] text-white">
+                    <th class="p-4 rounded-tl-2xl">ID</th>
+                    <th class="p-4">Nombre</th>
+                    <th class="p-4">Tipo</th>
+                    <th class="p-4">Estado</th>
+                    <th class="p-4">Fecha de Compra</th>
+                    <th class="p-4">ID del Gimnasio</th>
+                </tr>
+            </thead>
+            <tbody id="tablaEquipos" class="text-gray-700">
+
+
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6 text-center">Buscar Equipo para editarlo</h2>
+  <form id="buscarForm" class="space-y-4">
+      <div>
+          <label for="Getid_equipo" class="block text-gray-700">ID:</label>
+          <input type="number" id="Getid_equipo" name="id_equipo" required class="w-full p-2 border rounded-md">
+      </div>
+
+      <div>
+          <label for="Getnombre" class="block text-gray-700">Nombre del equipo:</label>
+          <input type="text" id="Getnombre" name="nombre" disabled class="w-full p-2 border rounded-md">
+      </div>
+
+      <div>
+          <label for="Gettipo" class="block text-gray-700">Tipo:</label>
+          <input type="text" id="Gettipo" name="tipo" disabled class="w-full p-2 border rounded-md">
+      </div>
+
+      <div>
+          <label for="Getestado" class="block text-gray-700">Estado:</label>
+          <input type="text" id="Getestado" name="estado" disabled class="w-full p-2 border rounded-md">
+      </div>
+
+      <div>
+          <label for="Getfecha_compra" class="block text-gray-700">Fecha de compra:</label>
+          <input type="text" id="Getfecha_compra" name="fecha_compra" disabled class="w-full p-2 border rounded-md">
+      </div>
+
+      <div>
+          <label for="Getid_gimnasio" class="block text-gray-700">ID del Gimnasio:</label>
+          <input type="number" id="Getid_gimnasio" name="id_gimnasio" disabled class="w-full p-2 border rounded-md">
+      </div>
+
+      <button type="button" id="consultarBtn" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+          Consultar
+      </button>
+
+      <button type="button" id="editarBtn" class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition hidden">
+          Editar
+      </button>
+
+      <button type="button" id="limpiarBtn" class="w-full bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 transition hidden">
+          Limpiar
+      </button>
+  </form>
+</div>
+
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6 text-center">Eliminar Equipo</h2>
+  <form id="buscarForm" class="space-y-4">
+      <div>
+          <label for="DeleteIDInput" class="block text-gray-700">ID del equipo que desea eliminar:</label>
+          <input type="number" id="DeleteIDInput" name="id_equipo" required class="w-full p-2 border rounded-md">
+      </div>
+
+      <button type="button" id="eliminarBtn" class="w-full bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition">
+          Eliminar
+      </button>
+  </form>
+</div>
+
+</body>
+</html>

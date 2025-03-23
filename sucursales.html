@@ -6,6 +6,7 @@
   <title>Pantalla de Inicio</title>
   <link rel="stylesheet" href="/estilos/inicio.css"> 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="sucursales.js"></script>
 </head>
 <body class="bg-gray-100">
     <nav class="bg-[#242424] p-4">
@@ -26,24 +27,34 @@
     </div>
   </nav>
 
-  <div class="min-h-screen flex items-center justify-center p-6">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl flex space-x-8">
-      
-      <div class="flex items-center p-4 border rounded-lg">
-        <img src="/fondos/inicio.jpg" alt="Descripción de la imagen" class="w-2/4 h-auto mr-4">
+  <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Registrar Sucursal</h2>
+    <form id="registroForm" class="space-y-4">
         <div>
-          <h2 class="text-xl font-semibold p-8">Bienvenido al sistema de Gym-Nordico
-          </h2>
-          <p class="text-gray-600 p-8" >Este es el centro donde gestionamos todo lo relacionado con nuestros miembros, clases y servicios. Asegúrate de mantener los datos actualizados y brindar un excelente servicio a cada uno de nuestros clientes. Si necesitas asistencia, no dudes en consultar las guías del sistema o comunicarte con el equipo de soporte.
-
-            Recuerda, la misión de Gym-Nordico es ofrecer un ambiente de bienestar y superación personal, y tu rol es clave para lograrlo. ¡Gracias por ser parte de este gran equipo!</p>
+            <label for="nombre_sucursal" class="block text-gray-700">Nombre de la sucursal:</label>
+            <input type="text" id="nombre_sucursal" name="nombre_sucursal" required class="w-full p-2 border rounded-md">
         </div>
-      
-      <div class="flex-1">
-        
-      </div>
-    </div>
-  </div>
+
+        <div>
+            <label for="direccion" class="block text-gray-700">Dirección:</label>
+            <input type="text" id="direccion" name="direccion" required class="w-full p-2 border rounded-md">
+        </div>
+
+        <div>
+            <label for="telefono" class="block text-gray-700">Teléfono:</label>
+            <input type="text" id="telefono" name="telefono" required class="w-full p-2 border rounded-md">
+        </div>
+
+        <div>
+            <label for="ciudad" class="block text-gray-700">Ciudad:</label>
+            <input type="text" id="ciudad" name="ciudad" required class="w-full p-2 border rounded-md">
+        </div>
+
+        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+            Registrar Sucursal
+        </button>
+    </form>
+</div>
 
 </body>
 </html>
