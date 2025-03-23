@@ -1,10 +1,18 @@
 <?php
 require 'db.php';
 
-// Función para registrar una nueva clase
-function registrarClase($nombre_clase, $descripcion, $id_instructor) {
+function registrarClase($nombre_clase, $descripcion, $id_instructor)
+{
     try {
         global $pdo;
+
+        $sql = "SELECT COUNT(*) FROM instructores WHERE id_instructor = :id_instructor";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_instructor' => $id_instructor]);
+
+        if ($stmt->fetchColumn() === 0) {
+            return "Instructor no encontrado";
+        }
 
         $sql = "INSERT INTO clases (id_clase, nombre_clase, descripcion, id_instructor)
                 VALUES (clases_seq.NEXTVAL, :nombre_clase, :descripcion, :id_instructor)";
@@ -16,53 +24,72 @@ function registrarClase($nombre_clase, $descripcion, $id_instructor) {
         ]);
 
         return true;
+
     } catch (Exception $e) {
-        return false;
+        error_log("Error registrando la clase: " . $e->getMessage());
+        return "Error registrando la clase: " . $e->getMessage();
     }
 }
 
-// Función para obtener todas las clases
-function obtenerClases() {
+function getClaseById($id)
+{
     try {
         global $pdo;
 
-        $sql = "SELECT c.id_clase, c.nombre_clase, c.descripcion, c.id_instructor, i.nombre AS instructor_nombre
-                FROM clases c
-                LEFT JOIN instructores i ON c.id_instructor = i.id_instructor
-                ORDER BY c.nombre_clase ASC";
+        $sql = "SELECT id_clase, nombre_clase, descripcion, id_instructor FROM clases WHERE id_clase = :id";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
+        error_log("Error al obtener clase: " . $e->getMessage());
+        return null;
+    }
+}
+
+function getClases()
+{
+    try {
+        global $pdo;
+
+        $sql = "SELECT id_clase, nombre_clase, descripcion, id_instructor FROM clases";
+        $stmt = $pdo->query($sql);
+        $clases = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $clases;
+
+    } catch (Exception $e) {
+        error_log("Error al obtener instructores: " . $e->getMessage());
         return [];
     }
 }
 
-// Función para actualizar una clase
-function actualizarClase($id_clase, $nombre_clase, $descripcion, $id_instructor) {
+function updateClase($id, $nombre_clase, $descripcion, $id_instructor)
+{
     try {
         global $pdo;
 
         $sql = "UPDATE clases 
-                SET nombre_clase = :nombre_clase, descripcion = :descripcion, id_instructor = :id_instructor
-                WHERE id_clase = :id_clase";
+                SET nombre_clase = :nombre_clase, descripcion = :descripcion, id_instructor = :id_instructor 
+                WHERE id_clase = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            'id_clase' => $id_clase,
+            'id' => $id,
             'nombre_clase' => $nombre_clase,
             'descripcion' => $descripcion,
             'id_instructor' => $id_instructor
         ]);
 
         return true;
+
     } catch (Exception $e) {
+        error_log("Error al actualizar clase: " . $e->getMessage());
         return false;
     }
 }
 
-// Función para eliminar una clase
-function eliminarClase($id_clase) {
+function deleteClaseById($id_clase)
+{
     try {
         global $pdo;
 
@@ -70,78 +97,47 @@ function eliminarClase($id_clase) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_clase' => $id_clase]);
 
-        return $stmt->rowCount() > 0 ? true : "Error al eliminar la clase.";
+        return $stmt->rowCount() > 0;
+
     } catch (Exception $e) {
-        return "Error al eliminar la clase: " . $e->getMessage();
+        return false;
     }
 }
 
-// Manejo de solicitudes HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        $clases = obtenerClases();
-        echo json_encode($clases);
+
+        if (isset($_GET['id'])) {
+            $nombre_clase = getClaseById($_GET['id']);
+            echo json_encode($nombre_clase);
+        } else {
+            $clases = getClases();
+            echo json_encode($clases);
+        }
+
         break;
 
     case 'POST':
-        $data = json_decode(file_get_contents('php://input'), true);
+        error_log("Datos recibidos: " . print_r($_POST, true));
 
-        if (isset($data['nombreClase']) && isset($data['descripcion']) && isset($data['idInstructor'])) {
-            $nombre_clase = $data['nombreClase'];
-            $descripcion = $data['descripcion'];
-            $id_instructor = $data['idInstructor'];
+        if (isset($_POST['nombre_clase']) && isset($_POST['descripcion']) && isset($_POST['id_instructor'])) {
+            $nombre_clase = $_POST['nombre_clase'];
+            $descripcion = $_POST['descripcion'];
+            $id_instructor = $_POST['id_instructor'];
 
-            if (registrarClase($nombre_clase, $descripcion, $id_instructor)) {
-                echo json_encode(["success" => "Clase registrada exitosamente"]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["error" => "Error registrando la clase"]);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(["error" => "Todos los campos son requeridos"]);
-        }
-        break;
-
-    case 'PUT':
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if (isset($data['idClase']) && isset($data['nombreClase']) && isset($data['descripcion']) && isset($data['idInstructor'])) {
-            $id_clase = $data['idClase'];
-            $nombre_clase = $data['nombreClase'];
-            $descripcion = $data['descripcion'];
-            $id_instructor = $data['idInstructor'];
-
-            if (actualizarClase($id_clase, $nombre_clase, $descripcion, $id_instructor)) {
-                echo json_encode(["success" => "Clase actualizada exitosamente"]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["error" => "Error actualizando la clase"]);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(["error" => "Todos los campos son requeridos"]);
-        }
-        break;
-
-    case 'DELETE':
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if (isset($data['idClase'])) {
-            $id_clase = $data['idClase'];
-            $resultado = eliminarClase($id_clase);
+            $resultado = registrarClase($nombre_clase, $descripcion, $id_instructor);
 
             if ($resultado === true) {
-                echo json_encode(["success" => "Clase eliminada exitosamente"]);
+                echo json_encode(["success" => "Clase registrada exitosamente"]);
             } else {
                 http_response_code(400);
                 echo json_encode(["error" => $resultado]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["error" => "ID de clase no proporcionado"]);
+            echo json_encode(["error" => "Todos los campos son requeridos"]);
         }
         break;
 
@@ -149,5 +145,47 @@ switch ($method) {
         http_response_code(405);
         echo json_encode(["error" => "Método no permitido"]);
         break;
+
+    case 'PUT':
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (isset($data['id_clase']) && isset($data['nombre_clase']) && isset($data['descripcion']) && isset($data['id_instructor'])) {
+            $id_clase = $data['id_clase'];
+            $nombre_clase = $data['nombre_clase'];
+            $descripcion = $data['descripcion'];
+            $id_instructor = $data['id_instructor'];
+
+            if (updateClase($id_clase, $nombre_clase, $descripcion, $id_instructor)) {
+                echo json_encode(["success" => "Clase actualizada exitosamente"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Error actualizando la clase"]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Datos incompletos"]);
+        }
+        break;
+        ;
+
+    case 'DELETE':
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (isset($data['id_clase'])) {
+            $id_clase = $data['id_clase'];
+
+            if (deleteClaseById($id_clase)) {
+                echo json_encode(["success" => "Clase eliminada exitosamente"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Error eliminando la clase"]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Clase no proporcionada"]);
+        }
+        break;
+
 }
-?>
+

@@ -1,0 +1,7 @@
+table tbody tr:nth-child(even) {
+    background-color: #f9fafb; /* Color gris muy suave para filas pares */
+}
+table tbody tr:hover {
+    background-color: #e0e7ff; /* Efecto hover suave en azul claro */
+    transition: background-color 0.3s ease;
+}
