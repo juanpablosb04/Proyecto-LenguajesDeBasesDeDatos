@@ -1,0 +1,28 @@
+body {
+    background-image: url('/fondos/gym-background.jpg'); 
+    background-size: cover;
+    background-position: center;
+    font-family: 'Arial', sans-serif;
+}
+
+nav {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #333;
+    font-size: 1.75rem;
+}
+
+label {
+    font-size: 1rem;
+}
+
+select {
+    cursor: pointer;
+}
+
+button {
+    font-size: 1.1rem;
+    font-weight: bold;
+}

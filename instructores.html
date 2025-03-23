@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Instructores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-[#242424] p-4 text-white">
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Gym-Nordico - Gestión de Instructores</h1>
+            <a href="/inicio.html" class="text-white bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition">Inicio</a>
+        </div>
+    </nav>
+
+    <!-- Formulario para agregar instructores -->
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">Registrar Instructor</h2>
+
+        <form id="registroInstructorForm" class="space-y-6">
+            <div>
+                <label for="nombre" class="block text-gray-700 font-semibold">Nombre Completo:</label>
+                <input type="text" id="nombre" name="nombre" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="especialidad" class="block text-gray-700 font-semibold">Especialidad:</label>
+                <input type="text" id="especialidad" name="especialidad" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="telefono" class="block text-gray-700 font-semibold">Teléfono:</label>
+                <input type="text" id="telefono" name="telefono" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="correo" class="block text-gray-700 font-semibold">Correo Electrónico:</label>
+                <input type="email" id="correo" name="correo" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="salario" class="block text-gray-700 font-semibold">Salario:</label>
+                <input type="number" id="salario" name="salario" step="0.01" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition">
+                Registrar Instructor
+            </button>
+        </form>
+    </div>
+
+    <!-- Sección para actualizar y eliminar instructores -->
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">Actualizar / Eliminar Instructor</h2>
+
+        <form id="actualizarInstructorForm" class="space-y-6">
+            <div>
+                <label for="selectInstructor" class="block text-gray-700 font-semibold">Seleccionar Instructor:</label>
+                <select id="selectInstructor" name="selectInstructor" class="w-full p-3 border rounded-md bg-gray-100">
+                    <option value="">Cargando instructores...</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="editNombre" class="block text-gray-700 font-semibold">Nombre:</label>
+                <input type="text" id="editNombre" name="editNombre" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="editEspecialidad" class="block text-gray-700 font-semibold">Especialidad:</label>
+                <input type="text" id="editEspecialidad" name="editEspecialidad" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="editTelefono" class="block text-gray-700 font-semibold">Teléfono:</label>
+                <input type="text" id="editTelefono" name="editTelefono" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="editCorreo" class="block text-gray-700 font-semibold">Correo Electrónico:</label>
+                <input type="email" id="editCorreo" name="editCorreo" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="editSalario" class="block text-gray-700 font-semibold">Salario:</label>
+                <input type="number" id="editSalario" name="editSalario" step="0.01" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <button type="submit" class="w-full bg-yellow-500 text-white p-3 rounded-md hover:bg-yellow-600 transition">
+                Actualizar Instructor
+            </button>
+
+            <button type="button" id="eliminarInstructor" class="w-full bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition">
+                Eliminar Instructor
+            </button>
+        </form>
+    </div>
+
+    <script src="instructores.js"></script>
+
+</body>
+</html>

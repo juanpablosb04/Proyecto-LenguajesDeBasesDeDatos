@@ -1,0 +1,97 @@
+body {
+    background-image: url('/fondos/gym-login.png');
+    background-size: cover;
+    background-position: center;
+}
+
+
+.w-full {
+    width: 100%;
+}
+
+.max-w-md {
+    max-width: 30rem;
+}
+
+.p-8 {
+    padding: 2rem;
+}
+
+.space-y-6 {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.bg-white {
+    background-color: rgba(255, 255, 255, 0.6); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+}
+
+.bg-opacity-80 {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.shadow-lg {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rounded-xl {
+    border-radius: 1rem;
+}
+
+.text-gray-700 {
+    color: #4a4a4a;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-gray-600 {
+    color: #6b6b6b;
+}
+
+.text-blue-500 {
+    color: #3b82f6;
+}
+
+.bg-blue-500 {
+    background-color: #3b82f6;
+}
+
+.hover\:bg-blue-600:hover {
+    background-color: #2563eb;
+}
+
+.hover\:underline:hover {
+    text-decoration: underline;
+}
+
+.focus\:outline-none:focus {
+    outline: none;
+}
+
+.focus\:ring-2:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.focus\:ring-blue-400:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.border {
+    border: 1px solid #ccc;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}

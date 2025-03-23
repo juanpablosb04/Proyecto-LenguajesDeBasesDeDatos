@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-[#242424] p-4 text-white">
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Gym-Nordico - Gestión de Productos</h1>
+            <a href="/inicio.html" class="text-white bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition">Inicio</a>
+        </div>
+    </nav>
+
+    <!-- Formulario para registrar productos -->
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">🛒 Registrar Nuevo Producto</h2>
+
+        <form id="registroProductoForm" class="space-y-6">
+            <div>
+                <label for="nombre_producto" class="block text-gray-700 font-semibold">Nombre del Producto:</label>
+                <input type="text" id="nombre_producto" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="precio" class="block text-gray-700 font-semibold">Precio:</label>
+                <input type="number" id="precio" step="0.01" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="stock" class="block text-gray-700 font-semibold">Stock:</label>
+                <input type="number" id="stock" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="tipo_producto" class="block text-gray-700 font-semibold">Tipo de Producto:</label>
+                <input type="text" id="tipo_producto" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition">
+                Registrar Producto
+            </button>
+        </form>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="max-w-5xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">Lista de Productos</h2>
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 p-2">ID</th>
+                    <th class="border border-gray-300 p-2">Nombre</th>
+                    <th class="border border-gray-300 p-2">Precio</th>
+                    <th class="border border-gray-300 p-2">Stock</th>
+                    <th class="border border-gray-300 p-2">Tipo</th>
+                    <th class="border border-gray-300 p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaProductos"></tbody>
+        </table>
+    </div>
+
+    <script src="productos.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Clases</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-[#242424] p-4 text-white">
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Gym-Nordico - Gestión de Clases</h1>
+            <a href="/inicio.html" class="text-white bg-blue-500 px-4 py-2 rounded-md hover:bg-blue-600 transition">Inicio</a>
+        </div>
+    </nav>
+
+    <!-- Formulario para registrar clases -->
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">Registrar Nueva Clase</h2>
+
+        <form id="registroClaseForm" class="space-y-6">
+            <div>
+                <label for="nombre_clase" class="block text-gray-700 font-semibold">Nombre de la Clase:</label>
+                <input type="text" id="nombre_clase" name="nombre_clase" required class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="descripcion" class="block text-gray-700 font-semibold">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" required class="w-full p-3 border rounded-md bg-gray-100"></textarea>
+            </div>
+
+            <div>
+                <label for="id_instructor" class="block text-gray-700 font-semibold">Seleccionar Instructor:</label>
+                <select id="id_instructor" name="id_instructor" class="w-full p-3 border rounded-md bg-gray-100">
+                    <option value="">Cargando instructores...</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition">
+                Registrar Clase
+            </button>
+        </form>
+    </div>
+
+    <!-- Sección para actualizar/eliminar clases -->
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6 text-center">Actualizar / Eliminar Clase</h2>
+
+        <form id="actualizarClaseForm" class="space-y-6">
+            <div>
+                <label for="selectClase" class="block text-gray-700 font-semibold">Seleccionar Clase:</label>
+                <select id="selectClase" name="selectClase" class="w-full p-3 border rounded-md bg-gray-100">
+                    <option value="">Cargando clases...</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="editNombreClase" class="block text-gray-700 font-semibold">Nombre:</label>
+                <input type="text" id="editNombreClase" name="editNombreClase" class="w-full p-3 border rounded-md bg-gray-100">
+            </div>
+
+            <div>
+                <label for="editDescripcion" class="block text-gray-700 font-semibold">Descripción:</label>
+                <textarea id="editDescripcion" name="editDescripcion" class="w-full p-3 border rounded-md bg-gray-100"></textarea>
+            </div>
+
+            <div>
+                <label for="editInstructor" class="block text-gray-700 font-semibold">Instructor:</label>
+                <select id="editInstructor" name="editInstructor" class="w-full p-3 border rounded-md bg-gray-100">
+                    <option value="">Cargando instructores...</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-yellow-500 text-white p-3 rounded-md hover:bg-yellow-600 transition">
+                Actualizar Clase
+            </button>
+
+            <button type="button" id="eliminarClase" class="w-full bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition">
+                Eliminar Clase
+            </button>
+        </form>
+    </div>
+
+    <script src="clases.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla de Inicio</title>
+  <link rel="stylesheet" href="/estilos/inicio.css"> 
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-[#242424] p-4">
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+          <div class="text-white text-xl font-bold">
+            <a>Gym-Nordico</a>
+          </div>
+          <div class="space-x-4">
+            <a href="/clientes.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clientes</a>
+            <a href="/membresias.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Membresias</a>
+            <a href="" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Entrenadores</a>
+            <a href="" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clases</a>
+            <a href="" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Productos</a>
+            <a href="" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Equipos</a>
+            <a href="/backend/logout.php" class="text-[#a1ef00] hover:bg-white hover:text-[#242424] px-4 py-2 rounded-md transition">Logout</a>
+        </div>    
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Registrar Membresía</h2>
+        <form id="registrarMembresiaForm" class="space-y-4">
+            <div>
+                <label for="cedula" class="block text-gray-700">Cédula del Cliente:</label>
+                <input type="text" id="cedula" name="cedula" required class="w-full p-2 border rounded-md">
+            </div>
+
+            <div>
+                <label for="costo_mensual" class="block text-gray-700">Costo Mensual:</label>
+                <input type="number" id="costo_mensual" name="costo_mensual" step="0.01" required class="w-full p-2 border rounded-md">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                Registrar Membresía
+            </button>
+        </form>
+    </div>
+
+    
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Consultar</h2>
+        <form id="consultarMembresiaForm" class="space-y-4">
+            <div>
+                <label for="consultarCedulaInput" class="block text-gray-700">Cédula del Cliente:</label>
+                <input type="text" id="consultarCedulaInput" name="consultarCedula" required class="w-full p-2 border rounded-md">
+            </div>
+    
+            <div>
+                <label for="editarCostoMensual" class="block text-gray-700">Costo Mensual:</label>
+                <input type="number" id="editarCostoMensual" name="editarCostoMensual" step="0.01" class="w-full p-2 border rounded-md">
+            </div>
+    
+            <div>
+                <label for="editarEstado" class="block text-gray-700">Estado:</label>
+                <select id="editarEstado" name="editarEstado" class="w-full p-2 border rounded-md">
+                    <option value="y">Activa</option>
+                    <option value="n">Inactiva</option>
+                </select>
+            </div>
+    
+            <button type="submit" id="consultarBtn" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+                Consultar Membresía
+            </button>
+
+            <button type="button" id="editarBtn" class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition hidden">
+                Editar
+            </button>
+
+            <button type="button" id="limpiarBtn" class="w-full bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 transition hidden">
+                Limpiar
+            </button>
+        </form>
+    </div>
+
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Eliminar Membresia</h2>
+        <form id="buscarForm" class="space-y-4">
+          
+          <div>
+            <label for="DeletemembresiaInput" class="block text-gray-700">Cédula:</label>
+            <input type="text" id="DeletemembresiaInput" name="cedula" required class="w-full p-2 border rounded-md">
+          </div>
+    
+    
+        <button type="button" id="eliminarBtn" class="w-full bg-red-500 text-white p-2 rounded-md hover:bg-gray-600 transition">
+          Eliminar
+      </button>
+        </form>
+    
+      </div>
+    
+    <script src="membresias.js"></script>
+    </body>
+    </html>
