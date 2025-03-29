@@ -93,6 +93,23 @@ function deleteProductoByID($id_producto)
     }
 }
 
+function deleteEquipoByID($id_equipo) {
+    try {
+        global $pdo;
+
+        $sql = "DELETE FROM equipos_gimnasio WHERE id_equipo = :id_equipo";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_equipo' => $id_equipo]);
+
+        return $stmt->rowCount() > 0;
+
+    } catch (Exception $e) {
+        error_log("Error eliminando el equipo: " . $e->getMessage());
+        return false;
+    }
+
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
@@ -139,7 +156,7 @@ switch ($method) {
     case 'PUT':
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (isset($data['id_producto']) && isset($data['nombre_producto']) && isset($data['precio']) && isset($data['stock']) && isset($data['tipo_producto'])){
+        if (isset($data['id_producto']) && isset($data['nombre_producto']) && isset($data['precio']) && isset($data['stock']) && isset($data['tipo_producto'])) {
             $id_producto = $data['id_producto'];
             $nombre_producto = $data['nombre_producto'];
             $precio = $data['precio'];
@@ -158,22 +175,40 @@ switch ($method) {
         }
         break;
 
-        case 'DELETE':
-            $data = json_decode(file_get_contents('php://input'), true);
-    
-            if (isset($data['id_producto'])) {
-                $id_producto = $data['id_producto'];
-    
-                if (deleteProductoByID($id_producto)) {
-                    echo json_encode(["success" => "Producto eliminado exitosamente"]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["error" => "Error eliminando el Producto"]);
-                }
+    case 'DELETE':
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (isset($data['id_producto'])) {
+            $id_producto = $data['id_producto'];
+
+            if (deleteProductoByID($id_producto)) {
+                echo json_encode(["success" => "Producto eliminado exitosamente"]);
             } else {
-                http_response_code(400);
-                echo json_encode(["error" => "Producto no proporcionado"]);
+                http_response_code(500);
+                echo json_encode(["error" => "Error eliminando el Producto"]);
             }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Producto no proporcionado"]);
+        }
+        break;
+
+    case 'DELETE':
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (isset($data['id_equipo'])) {
+            $id_equipo = $data['id_equipo'];
+
+            if (deleteEquipoByID($id_equipo)) {
+                echo json_encode(["success" => "Equipo eliminado exitosamente"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Error eliminando el equipo"]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "ID del equipo no proporcionado"]);
+        }
         break;
 
 }
