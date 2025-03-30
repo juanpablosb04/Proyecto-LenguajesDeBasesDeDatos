@@ -5,16 +5,7 @@ function registrarMantenimientos_equipos($id_equipo, $fecha_mantenimiento, $desc
     try {
         global $pdo;
 
-        $sql = "SELECT COUNT(*) FROM equipos_gimnasio WHERE id_equipo = :id_equipo";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_equipo' => $id_equipo]);
-
-        if ($stmt->fetchColumn() === 0) {
-            return ["error" => "Equipo no encontrado"];
-        }
-
-        $sql = "INSERT INTO mantenimiento_equipos (id_mantenimiento, id_equipo, fecha_mantenimiento, descripcion, estado)
-                VALUES (mantenimiento_equipos_seq.NEXTVAL, :id_equipo, TO_DATE(:fecha_mantenimiento, 'YYYY-MM-DD'), :descripcion, :estado)";
+        $sql = "BEGIN registrar_mantenimiento(:id_equipo, :fecha_mantenimiento, :descripcion, :estado); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_equipo' => $id_equipo,
@@ -23,10 +14,10 @@ function registrarMantenimientos_equipos($id_equipo, $fecha_mantenimiento, $desc
             'estado' => $estado
         ]);
 
-        return ["success" => "Mantenimiento del equipo registrado exitosamente"];
+        return ["success" => "Mantenimiento registrado exitosamente"];
 
     } catch (Exception $e) {
-        error_log("Error registrando el mantenimiento: " . $e->getMessage());
+        error_log("Error en registrarMantenimientos_equipos: " . $e->getMessage());
         return ["error" => "Error registrando el mantenimiento: " . $e->getMessage()];
     }
 }
@@ -47,13 +38,13 @@ function getMantenimientoByID($id_mantenimiento)
     }
 }
 
-function updateMantenimiento($id_mantenimiento, $id_equipo, $fecha_mantenimiento, $descripcion, $estado) {
+function actualizarMantenimientoEquipo($id_mantenimiento, $id_equipo, $fecha_mantenimiento, $descripcion, $estado)
+{
     try {
         global $pdo;
 
-        $sql = "UPDATE mantenimiento_equipos 
-                SET id_equipo = :id_equipo, fecha_mantenimiento = TO_DATE(:fecha_mantenimiento, 'YYYY-MM-DD'), descripcion = :estado
-                WHERE id_equipo = :id_equipo";
+        $sql = "BEGIN actualizar_mantenimiento(:id_mantenimiento, :id_equipo, :fecha_mantenimiento, :descripcion, :estado); END;";
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_mantenimiento' => $id_mantenimiento,
@@ -67,6 +58,22 @@ function updateMantenimiento($id_mantenimiento, $id_equipo, $fecha_mantenimiento
 
     } catch (Exception $e) {
         error_log("Error actualizando el mantenimiento: " . $e->getMessage());
+        return ["error" => "Error actualizando el mantenimiento: " . $e->getMessage()];
+    }
+}
+
+function deleteMantenimientoById($id_mantenimiento)
+{
+    try {
+        global $pdo;
+
+        $sql = "BEGIN eliminar_mantenimiento(:id_mantenimiento); END;";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_mantenimiento' => $id_mantenimiento]);
+
+        return $stmt->rowCount() > 0;
+
+    } catch (Exception $e) {
         return false;
     }
 }
@@ -118,23 +125,45 @@ switch ($method) {
         case 'PUT':
             $data = json_decode(file_get_contents('php://input'), true);
         
-            if (isset($data['id_mantenimiento']) && isset($data['id_equipo']) && isset($data['fecha_mantenimiento']) && isset($data['descripcion']) && isset($data['estado'])) {
+            if (isset($data['id_mantenimiento'], $data['id_equipo'], $data['fecha_mantenimiento'], 
+                     $data['descripcion'], $data['estado'])) {
                 $id_mantenimiento = $data['id_mantenimiento'];
                 $id_equipo = $data['id_equipo'];
                 $fecha_mantenimiento = $data['fecha_mantenimiento'];
                 $descripcion = $data['descripcion'];
                 $estado = $data['estado'];
         
-                if (updateMantenimiento($id_mantenimiento, $id_equipo, $fecha_mantenimiento, $descripcion, $estado)) {
+                $resultado = actualizarMantenimientoEquipo($id_mantenimiento, $id_equipo, 
+                              $fecha_mantenimiento, $descripcion, $estado);
+        
+                if (!isset($resultado['error'])) {
                     echo json_encode(["success" => "Mantenimiento actualizado exitosamente"]);
                 } else {
                     http_response_code(500);
-                    echo json_encode(["error" => "Error actualizando el Mantenimiento"]);
+                    echo json_encode($resultado);
                 }
             } else {
                 http_response_code(400);
                 echo json_encode(["error" => "Todos los campos son requeridos"]);
             }
-        break;
+            break;
+
+        case 'DELETE':
+            $data = json_decode(file_get_contents('php://input'), true);
+    
+            if (isset($data['id_mantenimiento'])) {
+                $id_mantenimiento = $data['id_mantenimiento'];
+    
+                if (deleteMantenimientoById($id_mantenimiento)) {
+                    echo json_encode(["success" => "Mantenimiento eliminado exitosamente"]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(["error" => "Error eliminando el mantenimiento"]);
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "ID de mantenimiento no proporcionado"]);
+            }
+            break;
 
 }

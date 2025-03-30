@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectInstructor = document.getElementById('selectInstructor');
     const formEditarInstructor = document.getElementById('formEditarInstructor');
 
+    cargarInstructores()
+    
+    function cargarInstructores(){
     fetch('/backend/instructores.php')
         .then(response => response.json())
         .then(data => {
@@ -18,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error al cargar instructores:', error);
             selectInstructor.innerHTML = '<option value="">Error al cargar instructores</option>';
         });
+    }
 
     document.getElementById('registroForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -33,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 this.reset();
                 alert(data.success);
+                cargarInstructores()
             } else {
                 alert(data.error);
             }
@@ -64,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         limpiarBtn.classList.remove('hidden');
                         eliminarBtn.classList.remove('hidden');
+
+                        cargarInstructores()
                     }
                 })
                 .catch(error => {
@@ -108,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert(data.success);
+                cargarInstructores()
             } else {
                 alert(data.error);
             }
@@ -167,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 document.getElementById('Getsalario').value = '';
 
                                 selectInstructor.selectedIndex = 0;
+                                cargarInstructores()
                                 
                             } else {
                                 alert(data.error);

@@ -5,8 +5,7 @@ function registrarSucursal($nombre_sucursal, $direccion, $telefono, $ciudad) {
     global $pdo;
 
     try {
-        $sql = "INSERT INTO sucursales (id_gimnasio, nombre_sucursal, direccion, telefono, ciudad)
-                VALUES (sucursales_seq.NEXTVAL, :nombre_sucursal, :direccion, :telefono, :ciudad)";
+        $sql = "BEGIN registrar_sucursal(:nombre_sucursal, :direccion, :telefono, :ciudad); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'nombre_sucursal' => $nombre_sucursal,

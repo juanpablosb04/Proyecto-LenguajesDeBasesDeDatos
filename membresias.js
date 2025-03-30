@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.success) {
                         alert(data.success);
+                        DeletemembresiaInput.value = '';
                     } else {
                         alert(data.error);
                     }

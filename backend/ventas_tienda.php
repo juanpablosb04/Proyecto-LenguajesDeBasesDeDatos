@@ -22,8 +22,7 @@ function registrarVentaTienda($cedula, $id_producto, $cantidad, $total, $fecha_v
             return ["error" => "Producto no encontrado"];
         }
 
-        $sql = "INSERT INTO ventas_tienda (id_venta, cedula, id_producto, cantidad, total, fecha_venta)
-                VALUES (ventas_tienda_seq.NEXTVAL, :cedula, :id_producto, :cantidad, :total, TO_DATE(:fecha_venta, 'YYYY-MM-DD'))";
+        $sql = "BEGIN registrar_venta(:cedula, :id_producto, :cantidad, :total, :fecha_venta); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'cedula' => $cedula,
@@ -33,12 +32,6 @@ function registrarVentaTienda($cedula, $id_producto, $cantidad, $total, $fecha_v
             'fecha_venta' => $fecha_venta
         ]);
 
-        $sql = "UPDATE productos_tienda SET stock = stock - :cantidad WHERE id_producto = :id_producto";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'cantidad' => $cantidad,
-            'id_producto' => $id_producto
-        ]);
 
         return ["success" => "Venta registrada exitosamente. Stock actualizado."];
 
@@ -69,14 +62,7 @@ function actualizarVentaTienda($id_venta, $cedula, $id_producto, $cantidad, $tot
     try {
         global $pdo;
 
-        $sql = "UPDATE ventas_tienda 
-                SET cedula = :cedula, 
-                    id_producto = :id_producto, 
-                    cantidad = :cantidad, 
-                    total = :total, 
-                    fecha_venta = TO_DATE(:fecha_venta, 'YYYY-MM-DD')
-                WHERE id_venta = :id_venta";
-
+        $sql = "BEGIN actualizar_venta_tienda(:id_venta, :cedula, :id_producto, :cantidad, :total, :fecha_venta); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_venta' => $id_venta,
@@ -100,7 +86,7 @@ function deleteVentaById($id_venta)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM ventas_tienda WHERE id_venta = :id_venta";
+        $sql = "BEGIN eliminar_venta_tienda(:id_venta); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_venta' => $id_venta]);
 

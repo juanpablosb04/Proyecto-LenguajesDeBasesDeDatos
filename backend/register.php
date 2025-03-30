@@ -9,8 +9,7 @@ function userRegistry($username, $password, $email)
         $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
 
         
-        $sql = "INSERT INTO empleados (id, username, password, email) 
-                VALUES (empleados_seq.NEXTVAL, :username, :password, :email)";
+        $sql = "BEGIN registrar_empleado(:username, :password, :email); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'username' => $username,

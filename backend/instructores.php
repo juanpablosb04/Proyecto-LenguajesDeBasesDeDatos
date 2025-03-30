@@ -6,8 +6,7 @@ function instructorRegistry($nombre, $especialidad, $telefono, $correo, $salario
     try {
         global $pdo;
 
-        $sql = "INSERT INTO instructores (id_instructor, nombre, especialidad, telefono, correo, salario)
-                VALUES (instructores_seq.NEXTVAL, :nombre, :especialidad, :telefono, :correo, :salario)";
+        $sql = "BEGIN registrar_instructor(:nombre, :especialidad, :telefono, :correo, :salario); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'nombre' => $nombre,
@@ -62,9 +61,7 @@ function updateInstructor($id, $nombre, $especialidad, $telefono, $correo, $sala
     try {
         global $pdo;
 
-        $sql = "UPDATE instructores 
-                SET nombre = :nombre, especialidad = :especialidad, telefono = :telefono, correo = :correo, salario = :salario 
-                WHERE id_instructor = :id";
+        $sql = "BEGIN actualizar_instructor(:id, :nombre, :especialidad, :telefono, :correo, :salario); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id' => $id,
@@ -88,7 +85,7 @@ function deleteInstructorById($id_instructor)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM instructores WHERE id_instructor = :id_instructor";
+        $sql = "BEGIN eliminar_instructor(:id_instructor); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_instructor' => $id_instructor]);
 

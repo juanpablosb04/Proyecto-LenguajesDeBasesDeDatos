@@ -36,9 +36,7 @@ function updateEquipo($id_equipo, $nombre, $tipo, $estado, $fecha_compra, $id_gi
     try {
         global $pdo;
 
-        $sql = "UPDATE equipos_gimnasio 
-                SET nombre = :nombre, tipo = :tipo, estado = :estado, fecha_compra = TO_DATE(:fecha_compra, 'YYYY-MM-DD'), id_gimnasio = :id_gimnasio
-                WHERE id_equipo = :id_equipo";
+        $sql = "BEGIN actualizar_equipo(:id_equipo, :nombre, :tipo, :estado, :fecha_compra, :id_gimnasio); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_equipo' => $id_equipo,
@@ -61,7 +59,7 @@ function deleteEquipoByID($id_equipo) {
     try {
         global $pdo;
 
-        $sql = "DELETE FROM equipos_gimnasio WHERE id_equipo = :id_equipo";
+        $sql = "BEGIN eliminar_equipo(:id_equipo); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_equipo' => $id_equipo]);
 

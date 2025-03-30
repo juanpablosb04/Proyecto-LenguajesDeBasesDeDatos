@@ -6,26 +6,17 @@ function registrarMembresia($cedula, $costo_mensual)
     try {
         global $pdo;
 
-        $sql = "SELECT COUNT(*) FROM clientes WHERE cedula = :cedula";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
-
-        if ($stmt->fetchColumn() === 0) {
-            return "Cliente no encontrado";
-        }
-
-        $sql = "INSERT INTO miembros (id_miembro, cedula, costo_mensual)
-                VALUES (miembros_seq.NEXTVAL, :cedula, :costo_mensual)";
+        $sql = "BEGIN registrar_membresia(:cedula, :costo_mensual); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'cedula' => $cedula,
             'costo_mensual' => $costo_mensual
         ]);
-
-        return true;
+        
+        return ($stmt->rowCount() > 0) ? true : "Cliente no encontrado";
 
     } catch (Exception $e) {
-        error_log("Error registrando la membresía: " . $e->getMessage());
+        error_log("Error en registrarMembresia: " . $e->getMessage());
         return "Error registrando la membresía: " . $e->getMessage();
     }
 }
@@ -50,9 +41,7 @@ function updateMembresia($cedula, $costo_mensual, $estado)
     try {
         global $pdo;
 
-        $sql = "UPDATE miembros 
-                SET costo_mensual = :costo_mensual, activo = :estado
-                WHERE cedula = :cedula";
+        $sql = "BEGIN actualizar_membresia(:cedula, :costo_mensual, :estado); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'cedula' => $cedula,
@@ -72,9 +61,10 @@ function deleteMembresiaByCedula($cedula)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM miembros WHERE cedula = :cedula";
+        $sql = "BEGIN eliminar_membresia(:cedula); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['cedula' => $cedula]);
+        
 
         return $stmt->rowCount() > 0;
 

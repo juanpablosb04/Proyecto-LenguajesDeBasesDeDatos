@@ -87,5 +87,98 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('No se encontró el botón de consulta o el campo de ID');
     }
+
+    editarBtn.addEventListener('click', function () {
+        const id_mantenimiento = document.getElementById('Getid_mantenimiento').value;
+        const id_equipo = document.getElementById('Getid_equipo').value;
+        const fecha_mantenimiento = document.getElementById('Getfecha_mantenimiento').value;
+        const descripcion = document.getElementById('Getdescripcion').value;
+        const estado = document.getElementById('Getestado').value;
+        
+
+        const datosActualizados = {
+            id_mantenimiento: id_mantenimiento,
+            id_equipo: id_equipo,
+            fecha_mantenimiento: fecha_mantenimiento,
+            descripcion: descripcion,
+            estado: estado
+        };
+
+        fetch('/backend/mantenimiento_equipos.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosActualizados)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.success);
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error al actualizar los datos:', error);
+                alert('Ocurrió un error al actualizar los datos');
+            });
+    });
+
+    limpiarBtn.addEventListener('click', function () {
+        document.getElementById('Getid_mantenimiento').value = '';
+        document.getElementById('Getid_equipo').value = '';
+        document.getElementById('Getfecha_mantenimiento').value = '';
+        document.getElementById('Getdescripcion').value = '';
+        document.getElementById('Getestado').value = '';
+
+        document.getElementById('Getid_equipo').setAttribute('disabled', true);
+        document.getElementById('Getfecha_mantenimiento').setAttribute('disabled', true);
+        document.getElementById('Getdescripcion').setAttribute('disabled', true);
+        document.getElementById('Getestado').setAttribute('disabled', true);
+        
+
+        document.getElementById('Getid_mantenimiento').removeAttribute('disabled');
+
+        editarBtn.classList.add('hidden');
+        limpiarBtn.classList.add('hidden');
+
+        console.log('Formulario limpiado');
+    });
+
+    if (eliminarBtn && DeleteIDInput) {
+        eliminarBtn.addEventListener('click', function () {
+            const id_mantenimiento = DeleteIDInput.value;
+
+            if (id_mantenimiento) {
+                if (confirm('¿Estás seguro de que deseas eliminar este mantenimiento?')) {
+                    fetch('/backend/mantenimiento_equipos.php', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id_mantenimiento: id_mantenimiento })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.success);
+                                DeleteIDInput.value = '';
+                            } else {
+                                alert(data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al eliminar el mantenimiento:', error);
+                            alert('Ocurrió un error al eliminar el mantenimiento');
+                        });
+                }
+            } else {
+                alert('Por favor, ingrese un ID de mantenimiento');
+            }
+        });
+    } else {
+        console.error('No se encontró el campo ID del mantenimiento');
+    }
     
 });

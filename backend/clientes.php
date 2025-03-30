@@ -33,13 +33,14 @@ function getUserByCedula($cedula)
     try {
         global $pdo;
 
-        $sql = "SELECT * FROM clientes WHERE cedula = :cedula";
+        $sql = "SELECT * FROM TABLE(obtener_cliente(:cedula))";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['cedula' => $cedula]);
-
+        
         return $stmt->fetch(PDO::FETCH_ASSOC);
-
+        
     } catch (Exception $e) {
+        error_log("Error en getUserByCedula: " . $e->getMessage());
         return null;
     }
 }
@@ -49,9 +50,7 @@ function updateUser($cedula, $nombre, $apellido, $correo, $telefono, $direccion,
     try {
         global $pdo;
 
-        $sql = "UPDATE clientes 
-                SET nombre = :nombre, apellido = :apellido, correo = :correo, telefono = :telefono, direccion = :direccion, fecha_registro = TO_DATE(:fecha_registro, 'YYYY-MM-DD')
-                WHERE cedula = :cedula";
+        $sql = "BEGIN actualizar_cliente(:cedula, :nombre, :apellido, :correo, :telefono, :direccion, :fecha_registro); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'cedula' => $cedula,
@@ -75,7 +74,7 @@ function deleteUserByCedula($cedula)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM clientes WHERE cedula = :cedula";
+        $sql = "BEGIN eliminar_cliente(:cedula); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['cedula' => $cedula]);
 

@@ -5,16 +5,7 @@ function registrarEquipos_gimnasio($nombre, $tipo, $estado, $fecha_compra, $id_g
     try {
         global $pdo;
 
-        $sql = "SELECT COUNT(*) FROM sucursales WHERE id_gimnasio = :id_gimnasio";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_gimnasio' => $id_gimnasio]);
-
-        if ($stmt->fetchColumn() === 0) {
-            return ["error" => "Sucursal no encontrada"];
-        }
-
-        $sql = "INSERT INTO equipos_gimnasio (id_equipo, nombre, tipo, estado, fecha_compra, id_gimnasio)
-                VALUES (equipos_gimnasio_seq.NEXTVAL, :nombre, :tipo, :estado, TO_DATE(:fecha_compra, 'YYYY-MM-DD'), :id_gimnasio)";
+        $sql = "BEGIN registrar_equipo_gimnasio(:nombre, :tipo, :estado, :fecha_compra, :id_gimnasio); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'nombre' => $nombre,

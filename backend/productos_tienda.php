@@ -6,8 +6,7 @@ function ProductoRegistry($nombre_producto, $precio, $stock, $tipo_producto)
     try {
         global $pdo;
 
-        $sql = "INSERT INTO productos_tienda (id_producto, nombre_producto, precio, stock, tipo_producto)
-                VALUES (productos_tienda_seq.NEXTVAL, :nombre_producto, :precio, :stock, :tipo_producto)";
+        $sql = "BEGIN registrar_producto(:nombre_producto, :precio, :stock, :tipo_producto); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'nombre_producto' => $nombre_producto,
@@ -58,9 +57,7 @@ function updateProducto($id_producto, $nombre_producto, $precio, $stock, $tipo_p
     try {
         global $pdo;
 
-        $sql = "UPDATE productos_tienda 
-                SET nombre_producto = :nombre_producto, precio = :precio, stock = :stock, tipo_producto = :tipo_producto
-                WHERE id_producto = :id_producto";
+        $sql = "BEGIN actualizar_producto(:id_producto, :nombre_producto, :precio, :stock, :tipo_producto); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_producto' => $id_producto,
@@ -82,7 +79,7 @@ function deleteProductoByID($id_producto)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM productos_tienda WHERE id_producto = :id_producto";
+        $sql = "BEGIN eliminar_producto(:id_producto); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_producto' => $id_producto]);
 
@@ -93,22 +90,6 @@ function deleteProductoByID($id_producto)
     }
 }
 
-function deleteEquipoByID($id_equipo) {
-    try {
-        global $pdo;
-
-        $sql = "DELETE FROM equipos_gimnasio WHERE id_equipo = :id_equipo";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_equipo' => $id_equipo]);
-
-        return $stmt->rowCount() > 0;
-
-    } catch (Exception $e) {
-        error_log("Error eliminando el equipo: " . $e->getMessage());
-        return false;
-    }
-
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 

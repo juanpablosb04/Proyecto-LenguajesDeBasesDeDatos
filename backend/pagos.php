@@ -6,35 +6,23 @@ function registrarPago($id_miembro, $monto, $metodo_pago, $fecha_pago)
     try {
         global $pdo;
 
-        // Verificar si el miembro existe
         $sql = "SELECT COUNT(*) FROM miembros WHERE id_miembro = :id_miembro";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_miembro' => $id_miembro]); // Corregido el nombre del parámetro
+        $stmt->execute(['id_miembro' => $id_miembro]);
 
         if ($stmt->fetchColumn() === 0) {
             return ["error" => "Miembro no encontrado"];
         }
 
-        // Insertar el pago
-        $sql = "INSERT INTO pagos (id_pago, id_miembro, fecha_pago, monto, metodo_pago)
-                VALUES (pagos_seq.NEXTVAL, :id_miembro, TO_DATE(:fecha_pago, 'YYYY-MM-DD'), :monto, :metodo_pago)";
+        $sql = "BEGIN registrar_pago(:id_miembro, :fecha_pago, :monto, :metodo_pago); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_miembro' => $id_miembro,
-            'fecha_pago' => $fecha_pago, // Corregido el nombre del parámetro
+            'fecha_pago' => $fecha_pago,
             'monto' => $monto,
-            'metodo_pago' => $metodo_pago // Corregido el nombre del parámetro
+            'metodo_pago' => $metodo_pago 
         ]);
 
-        // Actualizar el miembro (activo='y' y costo_mensual)
-        $sql = "UPDATE miembros 
-                SET activo = 'y', costo_mensual = :monto 
-                WHERE id_miembro = :id_miembro";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'monto' => $monto,
-            'id_miembro' => $id_miembro
-        ]);
 
         return ["success" => "Pago registrado exitosamente. Estado del miembro actualizado."];
 
@@ -65,13 +53,7 @@ function actualizarPago($id_pago, $id_miembro, $monto, $metodo_pago, $fecha_pago
     try {
         global $pdo;
 
-        $sql = "UPDATE pagos 
-                SET id_miembro = :id_miembro, 
-                    monto = :monto, 
-                    metodo_pago = :metodo_pago, 
-                    fecha_pago = TO_DATE(:fecha_pago, 'YYYY-MM-DD')
-                WHERE id_pago = :id_pago";
-
+        $sql = "BEGIN actualizar_pago(:id_pago, :id_miembro, :monto, :metodo_pago, :fecha_pago); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id_pago' => $id_pago,
@@ -79,15 +61,6 @@ function actualizarPago($id_pago, $id_miembro, $monto, $metodo_pago, $fecha_pago
             'monto' => $monto,
             'metodo_pago' => $metodo_pago,
             'fecha_pago' => $fecha_pago
-        ]);
-
-        $sql = "UPDATE miembros 
-                SET activo = 'y', costo_mensual = :monto 
-                WHERE id_miembro = :id_miembro";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'monto' => $monto,
-            'id_miembro' => $id_miembro
         ]);
 
         return ["success" => "Pago actualizado exitosamente. Estado del miembro actualizado."];
@@ -103,7 +76,7 @@ function deletePagoById($id_pago)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM pagos WHERE id_pago = :id_pago";
+        $sql = "BEGIN eliminar_pago(:id_pago); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_pago' => $id_pago]);
 

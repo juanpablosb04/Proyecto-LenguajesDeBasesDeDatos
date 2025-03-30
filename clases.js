@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectClase = document.getElementById('selectClase');
     const formEditarClase = document.getElementById('formEditarClase');
 
+    function cargarClases(){
     fetch('/backend/clases.php')
         .then(response => response.json())
         .then(data => {
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error al cargar clases:', error);
             selectInstructor.innerHTML = '<option value="">Error al cargar clases</option>';
         });
+    }
 
 
         selectClase.addEventListener('change', function () {
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success) {
                     alert(data.success);
+                    cargarClases();
                 } else {
                     alert(data.error);
                 }
@@ -118,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 document.getElementById('Getdescripcion').value = '';
                                 document.getElementById('Getid_instructor').value = '';
                                 selectClase.selectedIndex = 0;
+                                cargarClases();
                             } else {
                                 alert(data.error);
                             }
@@ -165,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         alert(data.success);
                         registrarClaseForm.reset();
+                        cargarClases();
                     } else {
                         alert(data.error);
                     }

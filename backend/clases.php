@@ -6,16 +6,7 @@ function registrarClase($nombre_clase, $descripcion, $id_instructor)
     try {
         global $pdo;
 
-        $sql = "SELECT COUNT(*) FROM instructores WHERE id_instructor = :id_instructor";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_instructor' => $id_instructor]);
-
-        if ($stmt->fetchColumn() === 0) {
-            return "Instructor no encontrado";
-        }
-
-        $sql = "INSERT INTO clases (id_clase, nombre_clase, descripcion, id_instructor)
-                VALUES (clases_seq.NEXTVAL, :nombre_clase, :descripcion, :id_instructor)";
+        $sql = "BEGIN registrar_clase(:nombre_clase, :descripcion, :id_instructor); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'nombre_clase' => $nombre_clase,
@@ -69,9 +60,7 @@ function updateClase($id, $nombre_clase, $descripcion, $id_instructor)
     try {
         global $pdo;
 
-        $sql = "UPDATE clases 
-                SET nombre_clase = :nombre_clase, descripcion = :descripcion, id_instructor = :id_instructor 
-                WHERE id_clase = :id";
+        $sql = "BEGIN actualizar_clase(:id, :nombre_clase, :descripcion, :id_instructor); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'id' => $id,
@@ -93,7 +82,7 @@ function deleteClaseById($id_clase)
     try {
         global $pdo;
 
-        $sql = "DELETE FROM clases WHERE id_clase = :id_clase";
+        $sql = "BEGIN eliminar_clase(:id_clase); END;";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id_clase' => $id_clase]);
 
