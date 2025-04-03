@@ -48,41 +48,44 @@ function getPagoByID($id_pago)
     }
 }
 
-function actualizarPago($id_pago, $id_miembro, $monto, $metodo_pago, $fecha_pago)
-{
+function actualizarPago($id_pago, $id_miembro, $monto, $metodo_pago, $fecha_pago) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN actualizar_pago(:id_pago, :id_miembro, :monto, :metodo_pago, :fecha_pago); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_pago' => $id_pago,
-            'id_miembro' => $id_miembro,
-            'monto' => $monto,
-            'metodo_pago' => $metodo_pago,
-            'fecha_pago' => $fecha_pago
-        ]);
+        $sql = "BEGIN actualizar_pago(:id_pago, :id_miembro, :monto, :metodo_pago, TO_DATE(:fecha_pago, 'YYYY-MM-DD')); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_pago', $id_pago);
+        oci_bind_by_name($stmt, ':id_miembro', $id_miembro);
+        oci_bind_by_name($stmt, ':monto', $monto);
+        oci_bind_by_name($stmt, ':metodo_pago', $metodo_pago);
+        oci_bind_by_name($stmt, ':fecha_pago', $fecha_pago);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return ["success" => "Pago actualizado exitosamente. Estado del miembro actualizado."];
-
     } catch (Exception $e) {
         error_log("Error actualizando el pago: " . $e->getMessage());
         return ["error" => "Error actualizando el pago: " . $e->getMessage()];
     }
 }
 
-function deletePagoById($id_pago)
-{
+function deletePagoById($id_pago) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN eliminar_pago(:id_pago); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_pago' => $id_pago]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_pago', $id_pago);
 
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return true;
     } catch (Exception $e) {
+        error_log("Error eliminando el pago: " . $e->getMessage());
         return false;
     }
 }

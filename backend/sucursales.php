@@ -2,17 +2,19 @@
 require 'db.php';
 
 function registrarSucursal($nombre_sucursal, $direccion, $telefono, $ciudad) {
-    global $pdo;
+    global $conn;
 
     try {
         $sql = "BEGIN registrar_sucursal(:nombre_sucursal, :direccion, :telefono, :ciudad); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'nombre_sucursal' => $nombre_sucursal,
-            'direccion' => $direccion,
-            'telefono' => $telefono,
-            'ciudad' => $ciudad
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':nombre_sucursal', $nombre_sucursal);
+        oci_bind_by_name($stmt, ':direccion', $direccion);
+        oci_bind_by_name($stmt, ':telefono', $telefono);
+        oci_bind_by_name($stmt, ':ciudad', $ciudad);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return ["success" => "Sucursal registrada exitosamente"];
 

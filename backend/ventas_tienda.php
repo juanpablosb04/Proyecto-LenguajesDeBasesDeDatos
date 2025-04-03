@@ -57,42 +57,45 @@ function getVentaProductoByID($id_venta)
     }
 }
 
-function actualizarVentaTienda($id_venta, $cedula, $id_producto, $cantidad, $total, $fecha_venta)
-{
+function actualizarVentaTienda($id_venta, $cedula, $id_producto, $cantidad, $total, $fecha_venta) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN actualizar_venta_tienda(:id_venta, :cedula, :id_producto, :cantidad, :total, :fecha_venta); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_venta' => $id_venta,
-            'cedula' => $cedula,
-            'id_producto' => $id_producto,
-            'cantidad' => $cantidad,
-            'total' => $total,
-            'fecha_venta' => $fecha_venta
-        ]);
+        $sql = "BEGIN actualizar_venta_tienda(:id_venta, :cedula, :id_producto, :cantidad, :total, TO_DATE(:fecha_venta, 'YYYY-MM-DD')); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_venta', $id_venta);
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
+        oci_bind_by_name($stmt, ':cantidad', $cantidad);
+        oci_bind_by_name($stmt, ':total', $total);
+        oci_bind_by_name($stmt, ':fecha_venta', $fecha_venta);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return true;
-
     } catch (Exception $e) {
         error_log("Error actualizando la venta: " . $e->getMessage());
         return ["error" => "Error actualizando la venta: " . $e->getMessage()];
     }
 }
 
-function deleteVentaById($id_venta)
-{
+function deleteVentaById($id_venta) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN eliminar_venta_tienda(:id_venta); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_venta' => $id_venta]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_venta', $id_venta);
 
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return true;
     } catch (Exception $e) {
+        error_log("Error eliminando la venta: " . $e->getMessage());
         return false;
     }
 }

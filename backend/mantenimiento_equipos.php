@@ -3,16 +3,18 @@ require 'db.php';
 
 function registrarMantenimientos_equipos($id_equipo, $fecha_mantenimiento, $descripcion, $estado) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN registrar_mantenimiento(:id_equipo, :fecha_mantenimiento, :descripcion, :estado); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_equipo' => $id_equipo,
-            'fecha_mantenimiento' => $fecha_mantenimiento,
-            'descripcion' => $descripcion,
-            'estado' => $estado
-        ]);
+        $sql = "BEGIN registrar_mantenimiento(:id_equipo, TO_DATE(:fecha_mantenimiento, 'YYYY-MM-DD'), :descripcion, :estado); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_equipo', $id_equipo);
+        oci_bind_by_name($stmt, ':fecha_mantenimiento', $fecha_mantenimiento);
+        oci_bind_by_name($stmt, ':descripcion', $descripcion);
+        oci_bind_by_name($stmt, ':estado', $estado);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return ["success" => "Mantenimiento registrado exitosamente"];
 
@@ -38,21 +40,21 @@ function getMantenimientoByID($id_mantenimiento)
     }
 }
 
-function actualizarMantenimientoEquipo($id_mantenimiento, $id_equipo, $fecha_mantenimiento, $descripcion, $estado)
-{
+function actualizarMantenimientoEquipo($id_mantenimiento, $id_equipo, $fecha_mantenimiento, $descripcion, $estado) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN actualizar_mantenimiento(:id_mantenimiento, :id_equipo, :fecha_mantenimiento, :descripcion, :estado); END;";
+        $sql = "BEGIN actualizar_mantenimiento(:id_mantenimiento, :id_equipo, TO_DATE(:fecha_mantenimiento, 'YYYY-MM-DD'), :descripcion, :estado); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_mantenimiento' => $id_mantenimiento,
-            'id_equipo' => $id_equipo,
-            'fecha_mantenimiento' => $fecha_mantenimiento,
-            'descripcion' => $descripcion,
-            'estado' => $estado
-        ]);
+        oci_bind_by_name($stmt, ':id_mantenimiento', $id_mantenimiento);
+        oci_bind_by_name($stmt, ':id_equipo', $id_equipo);
+        oci_bind_by_name($stmt, ':fecha_mantenimiento', $fecha_mantenimiento);
+        oci_bind_by_name($stmt, ':descripcion', $descripcion);
+        oci_bind_by_name($stmt, ':estado', $estado);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return true;
 
@@ -62,18 +64,22 @@ function actualizarMantenimientoEquipo($id_mantenimiento, $id_equipo, $fecha_man
     }
 }
 
-function deleteMantenimientoById($id_mantenimiento)
-{
+function deleteMantenimientoById($id_mantenimiento) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN eliminar_mantenimiento(:id_mantenimiento); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_mantenimiento' => $id_mantenimiento]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_mantenimiento', $id_mantenimiento);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return true;
 
     } catch (Exception $e) {
+        error_log("Error eliminando el mantenimiento: " . $e->getMessage());
         return false;
     }
 }

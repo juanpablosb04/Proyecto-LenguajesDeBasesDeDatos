@@ -34,18 +34,20 @@ function getEquipoByID($id_equipo)
 
 function updateEquipo($id_equipo, $nombre, $tipo, $estado, $fecha_compra, $id_gimnasio) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN actualizar_equipo(:id_equipo, :nombre, :tipo, :estado, :fecha_compra, :id_gimnasio); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_equipo' => $id_equipo,
-            'nombre' => $nombre,
-            'tipo' => $tipo,
-            'estado' => $estado,
-            'fecha_compra' => $fecha_compra,
-            'id_gimnasio' => $id_gimnasio
-        ]);
+        $sql = "BEGIN actualizar_equipo(:id_equipo, :nombre, :tipo, :estado, TO_DATE(:fecha_compra, 'YYYY-MM-DD'), :id_gimnasio); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_equipo', $id_equipo);
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':tipo', $tipo);
+        oci_bind_by_name($stmt, ':estado', $estado);
+        oci_bind_by_name($stmt, ':fecha_compra', $fecha_compra);
+        oci_bind_by_name($stmt, ':id_gimnasio', $id_gimnasio);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return true;
 
@@ -57,19 +59,22 @@ function updateEquipo($id_equipo, $nombre, $tipo, $estado, $fecha_compra, $id_gi
 
 function deleteEquipoByID($id_equipo) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN eliminar_equipo(:id_equipo); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_equipo' => $id_equipo]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_equipo', $id_equipo);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return true;
 
     } catch (Exception $e) {
         error_log("Error eliminando el equipo: " . $e->getMessage());
         return false;
     }
-
 }
 
 $method = $_SERVER['REQUEST_METHOD'];

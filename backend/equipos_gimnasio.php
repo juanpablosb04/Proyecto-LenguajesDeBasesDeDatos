@@ -3,17 +3,19 @@ require 'db.php';
 
 function registrarEquipos_gimnasio($nombre, $tipo, $estado, $fecha_compra, $id_gimnasio) {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "BEGIN registrar_equipo_gimnasio(:nombre, :tipo, :estado, :fecha_compra, :id_gimnasio); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'nombre' => $nombre,
-            'tipo' => $tipo,
-            'estado' => $estado,
-            'fecha_compra' => $fecha_compra,
-            'id_gimnasio' => $id_gimnasio
-        ]);
+        $sql = "BEGIN registrar_equipo_gimnasio(:nombre, :tipo, :estado, TO_DATE(:fecha_compra, 'YYYY-MM-DD'), :id_gimnasio); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':tipo', $tipo);
+        oci_bind_by_name($stmt, ':estado', $estado);
+        oci_bind_by_name($stmt, ':fecha_compra', $fecha_compra);
+        oci_bind_by_name($stmt, ':id_gimnasio', $id_gimnasio);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return ["success" => "Equipo de gimnasio registrado exitosamente"];
 

@@ -3,16 +3,18 @@ require 'db.php';
 
 function registrarClase($nombre_clase, $descripcion, $id_instructor)
 {
-    try {
-        global $pdo;
+    global $conn;
 
+    try {
         $sql = "BEGIN registrar_clase(:nombre_clase, :descripcion, :id_instructor); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'nombre_clase' => $nombre_clase,
-            'descripcion' => $descripcion,
-            'id_instructor' => $id_instructor
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':nombre_clase', $nombre_clase);
+        oci_bind_by_name($stmt, ':descripcion', $descripcion);
+        oci_bind_by_name($stmt, ':id_instructor', $id_instructor);
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
 
         return true;
 
@@ -21,6 +23,7 @@ function registrarClase($nombre_clase, $descripcion, $id_instructor)
         return "Error registrando la clase: " . $e->getMessage();
     }
 }
+
 
 function getClaseById($id)
 {
@@ -57,17 +60,19 @@ function getClases()
 
 function updateClase($id, $nombre_clase, $descripcion, $id_instructor)
 {
-    try {
-        global $pdo;
+    global $conn;
 
+    try {
         $sql = "BEGIN actualizar_clase(:id, :nombre_clase, :descripcion, :id_instructor); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id' => $id,
-            'nombre_clase' => $nombre_clase,
-            'descripcion' => $descripcion,
-            'id_instructor' => $id_instructor
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id', $id);
+        oci_bind_by_name($stmt, ':nombre_clase', $nombre_clase);
+        oci_bind_by_name($stmt, ':descripcion', $descripcion);
+        oci_bind_by_name($stmt, ':id_instructor', $id_instructor);
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
 
         return true;
 
@@ -79,19 +84,25 @@ function updateClase($id, $nombre_clase, $descripcion, $id_instructor)
 
 function deleteClaseById($id_clase)
 {
+    global $conn;
+
     try {
-        global $pdo;
-
         $sql = "BEGIN eliminar_clase(:id_clase); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_clase' => $id_clase]);
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':id_clase', $id_clase);
 
-        return $stmt->rowCount() > 0;
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
+
+        return true;
 
     } catch (Exception $e) {
+        error_log("Error al eliminar clase: " . $e->getMessage());
         return false;
     }
 }
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 

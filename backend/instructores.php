@@ -3,34 +3,52 @@ require 'db.php';
 
 function instructorRegistry($nombre, $especialidad, $telefono, $correo, $salario)
 {
-    try {
-        global $pdo;
+    global $conn;
 
+    try {
         $sql = "BEGIN registrar_instructor(:nombre, :especialidad, :telefono, :correo, :salario); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'nombre' => $nombre,
-            'especialidad' => $especialidad,
-            'telefono' => $telefono,
-            'correo' => $correo,
-            'salario' => $salario
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':especialidad', $especialidad);
+        oci_bind_by_name($stmt, ':telefono', $telefono);
+        oci_bind_by_name($stmt, ':correo', $correo);
+        oci_bind_by_name($stmt, ':salario', $salario);
+
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
 
         return true;
 
     } catch (Exception $e) {
+        error_log("Error en instructorRegistry: " . $e->getMessage());
         return false;
     }
 }
 
+
 function getInstructores()
 {
-    try {
-        global $pdo;
+    global $conn;
 
-        $sql = "SELECT id_instructor, nombre, especialidad, telefono, correo, salario FROM instructores";
-        $stmt = $pdo->query($sql);
-        $instructores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "BEGIN :cursor := obtener_instructores(); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        oci_bind_by_name($stmt, ':cursor', $cursor, -1, OCI_B_CURSOR);
+
+        oci_execute($stmt);
+        oci_execute($cursor);
+
+        $instructores = [];
+        while (($row = oci_fetch_assoc($cursor)) !== false) {
+            $instructores[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        oci_free_statement($cursor);
 
         return $instructores;
 
@@ -39,6 +57,7 @@ function getInstructores()
         return [];
     }
 }
+
 
 function getInstructorById($id)
 {
@@ -58,43 +77,53 @@ function getInstructorById($id)
 
 function updateInstructor($id, $nombre, $especialidad, $telefono, $correo, $salario)
 {
-    try {
-        global $pdo;
+    global $conn;
 
+    try {
         $sql = "BEGIN actualizar_instructor(:id, :nombre, :especialidad, :telefono, :correo, :salario); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id' => $id,
-            'nombre' => $nombre,
-            'especialidad' => $especialidad,
-            'telefono' => $telefono,
-            'correo' => $correo,
-            'salario' => $salario
-        ]);
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':id', $id);
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':especialidad', $especialidad);
+        oci_bind_by_name($stmt, ':telefono', $telefono);
+
+        oci_bind_by_name($stmt, ':correo', $correo);
+        oci_bind_by_name($stmt, ':salario', $salario);
+
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
 
         return true;
 
     } catch (Exception $e) {
-        error_log("Error al actualizar instructor: " . $e->getMessage());
+        error_log("Error en updateInstructor: " . $e->getMessage());
         return false;
     }
 }
+
 
 function deleteInstructorById($id_instructor)
 {
+    global $conn;
+
     try {
-        global $pdo;
-
         $sql = "BEGIN eliminar_instructor(:id_instructor); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_instructor' => $id_instructor]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_instructor', $id_instructor);
+        oci_execute($stmt);
+
+        oci_free_statement($stmt);
+
+        return true;
 
     } catch (Exception $e) {
+        error_log("Error en deleteInstructorById: " . $e->getMessage());
         return false;
     }
 }
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 

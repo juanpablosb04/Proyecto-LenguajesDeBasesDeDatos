@@ -2,43 +2,61 @@
 require 'db.php';
 
 
-function userRegistry($cedula, $nombre, $apellido, $correo, $telefono, $direccion, $fecha_registro)
+function ClientRegistry($cedula, $nombre, $apellido, $correo, $telefono, $direccion, $fecha_registro)
 {
-    global $pdo;
-    
+    global $conn;
+
     try {
         
         $sql = "BEGIN insertar_cliente(:cedula, :nombre, :apellido, :correo, :telefono, :direccion, TO_DATE(:fecha_registro, 'YYYY-MM-DD')); END;";
-        $stmt = $pdo->prepare($sql);
-         $stmt->execute([
-             'nombre' => $nombre,
-             'cedula' => $cedula,
-             'apellido' => $apellido,
-             'correo' => $correo,
-             'telefono' => $telefono,
-             'direccion' => $direccion,
-             'fecha_registro' => $fecha_registro
-         ]);
- 
-         return true;
- 
-     } catch (Exception $e) {
-        error_log("Error en userRegistry: " . $e->getMessage());
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':apellido', $apellido);
+        oci_bind_by_name($stmt, ':correo', $correo);
+        oci_bind_by_name($stmt, ':telefono', $telefono);
+        oci_bind_by_name($stmt, ':direccion', $direccion);
+        oci_bind_by_name($stmt, ':fecha_registro', $fecha_registro);
+
+        if (oci_execute($stmt)) {
+            oci_free_statement($stmt);
+            return true;
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en ClientRegistry: " . $error['message']);
+            oci_free_statement($stmt);
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("Error en ClientRegistry: " . $e->getMessage());
         return false;
     }
- }
+}
 
 function getUserByCedula($cedula)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_cliente_por_cedula(:cedula); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM TABLE(obtener_cliente(:cedula))";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
+        $cursor = oci_new_cursor($conn);
         
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_bind_by_name($stmt, ":cedula", $cedula);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
         
+        oci_execute($stmt);
+
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
+
     } catch (Exception $e) {
         error_log("Error en getUserByCedula: " . $e->getMessage());
         return null;
@@ -47,43 +65,61 @@ function getUserByCedula($cedula)
 
 function updateUser($cedula, $nombre, $apellido, $correo, $telefono, $direccion, $fecha_registro)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN actualizar_cliente(:cedula, :nombre, :apellido, :correo, :telefono, :direccion, TO_DATE(:fecha_registro, 'YYYY-MM-DD')); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "BEGIN actualizar_cliente(:cedula, :nombre, :apellido, :correo, :telefono, :direccion, :fecha_registro); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'cedula' => $cedula,
-            'nombre' => $nombre,
-            'apellido' => $apellido,
-            'correo' => $correo,
-            'telefono' => $telefono,
-            'direccion' => $direccion,
-            'fecha_registro' => $fecha_registro
-        ]);
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':nombre', $nombre);
+        oci_bind_by_name($stmt, ':apellido', $apellido);
+        oci_bind_by_name($stmt, ':correo', $correo);
+        oci_bind_by_name($stmt, ':telefono', $telefono);
+        oci_bind_by_name($stmt, ':direccion', $direccion);
+        oci_bind_by_name($stmt, ':fecha_registro', $fecha_registro);
 
-        return true;
-
+        if (oci_execute($stmt)) {
+            oci_free_statement($stmt);
+            return true;
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en updateUser: " . $error['message']);
+            oci_free_statement($stmt);
+            return false;
+        }
     } catch (Exception $e) {
+        error_log("Error en updateUser: " . $e->getMessage());
         return false;
     }
 }
+
 
 function deleteUserByCedula($cedula)
 {
+    global $conn;
+
     try {
-        global $pdo;
-
         $sql = "BEGIN eliminar_cliente(:cedula); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':cedula', $cedula);
 
+        if (oci_execute($stmt)) {
+            $rowsAffected = oci_num_rows($stmt);
+            oci_free_statement($stmt);
+            return $rowsAffected > 0;
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en deleteUserByCedula: " . $error['message']);
+            oci_free_statement($stmt);
+            return false;
+        }
     } catch (Exception $e) {
+        error_log("Error en deleteUserByCedula: " . $e->getMessage());
         return false;
     }
 }
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -116,7 +152,7 @@ switch ($method) {
             $direccion = $_POST['direccion'];
             $fecha_registro = $_POST['fecha_registro'];
     
-            if (userRegistry($cedula, $nombre, $apellido, $correo, $telefono, $direccion, $fecha_registro)) {
+            if (ClientRegistry($cedula, $nombre, $apellido, $correo, $telefono, $direccion, $fecha_registro)) {
                 echo json_encode(["success" => "Usuario registrado exitosamente"]);
             } else {
                 http_response_code(500);

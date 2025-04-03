@@ -3,23 +3,30 @@ require 'db.php';
 
 function registrarMembresia($cedula, $costo_mensual)
 {
+    global $conn; 
     try {
-        global $pdo;
-
         $sql = "BEGIN registrar_membresia(:cedula, :costo_mensual); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'cedula' => $cedula,
-            'costo_mensual' => $costo_mensual
-        ]);
-        
-        return ($stmt->rowCount() > 0) ? true : "Cliente no encontrado";
+        $stmt = oci_parse($conn, $sql);
 
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':costo_mensual', $costo_mensual);
+
+        if (oci_execute($stmt)) {
+            $rowsAffected = oci_num_rows($stmt);
+            oci_free_statement($stmt);
+            return ($rowsAffected > 0) ? true : "Cliente no encontrado";
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en registrarMembresia: " . $error['message']);
+            oci_free_statement($stmt);
+            return "Error registrando la membresía: " . $error['message'];
+        }
     } catch (Exception $e) {
         error_log("Error en registrarMembresia: " . $e->getMessage());
         return "Error registrando la membresía: " . $e->getMessage();
     }
 }
+
 
 function getMembresiaByCedula($cedula)
 {
@@ -38,40 +45,56 @@ function getMembresiaByCedula($cedula)
 
 function updateMembresia($cedula, $costo_mensual, $estado)
 {
+    global $conn;
     try {
-        global $pdo;
-
         $sql = "BEGIN actualizar_membresia(:cedula, :costo_mensual, :estado); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'cedula' => $cedula,
-            'costo_mensual' => $costo_mensual,
-            'estado' => $estado
-        ]);
+        $stmt = oci_parse($conn, $sql);
 
-        return true;
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':costo_mensual', $costo_mensual);
+        oci_bind_by_name($stmt, ':estado', $estado);
 
+        if (oci_execute($stmt)) {
+            oci_free_statement($stmt);
+            return true;
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en updateMembresia: " . $error['message']);
+            oci_free_statement($stmt);
+            return false;
+        }
     } catch (Exception $e) {
+        error_log("Error en updateMembresia: " . $e->getMessage());
         return false;
     }
 }
+
 
 function deleteMembresiaByCedula($cedula)
 {
+    global $conn;
     try {
-        global $pdo;
-
         $sql = "BEGIN eliminar_membresia(:cedula); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
-        
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':cedula', $cedula);
 
+        if (oci_execute($stmt)) {
+            $rowsAffected = oci_num_rows($stmt);
+            oci_free_statement($stmt);
+            return $rowsAffected > 0;
+        } else {
+            $error = oci_error($stmt);
+            error_log("Error en deleteMembresiaByCedula: " . $error['message']);
+            oci_free_statement($stmt);
+            return false;
+        }
     } catch (Exception $e) {
+        error_log("Error en deleteMembresiaByCedula: " . $e->getMessage());
         return false;
     }
 }
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 

@@ -1,22 +1,24 @@
 <?php
 require 'db.php';
 
-function ProductoRegistry($nombre_producto, $precio, $stock, $tipo_producto)
-{
+function ProductoRegistry($nombre_producto, $precio, $stock, $tipo_producto) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN registrar_producto(:nombre_producto, :precio, :stock, :tipo_producto); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'nombre_producto' => $nombre_producto,
-            'precio' => $precio,
-            'stock' => $stock,
-            'tipo_producto' => $tipo_producto
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':nombre_producto', $nombre_producto);
+        oci_bind_by_name($stmt, ':precio', $precio);
+        oci_bind_by_name($stmt, ':stock', $stock);
+        oci_bind_by_name($stmt, ':tipo_producto', $tipo_producto);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return true;
     } catch (Exception $e) {
+        error_log("Error registrando el producto: " . $e->getMessage());
         return false;
     }
 }
@@ -52,40 +54,44 @@ function getProductoByID($id_producto)
     }
 }
 
-function updateProducto($id_producto, $nombre_producto, $precio, $stock, $tipo_producto)
-{
+function updateProducto($id_producto, $nombre_producto, $precio, $stock, $tipo_producto) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN actualizar_producto(:id_producto, :nombre_producto, :precio, :stock, :tipo_producto); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_producto' => $id_producto,
-            'nombre_producto' => $nombre_producto,
-            'precio' => $precio,
-            'stock' => $stock,
-            'tipo_producto' => $tipo_producto
-        ]);
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
+        oci_bind_by_name($stmt, ':nombre_producto', $nombre_producto);
+        oci_bind_by_name($stmt, ':precio', $precio);
+        oci_bind_by_name($stmt, ':stock', $stock);
+        oci_bind_by_name($stmt, ':tipo_producto', $tipo_producto);
+
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
         return true;
-
     } catch (Exception $e) {
+        error_log("Error actualizando el producto: " . $e->getMessage());
         return false;
     }
 }
 
-function deleteProductoByID($id_producto)
-{
+function deleteProductoByID($id_producto) {
     try {
-        global $pdo;
+        global $conn;
 
         $sql = "BEGIN eliminar_producto(:id_producto); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_producto' => $id_producto]);
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->rowCount() > 0;
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
 
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return true;
     } catch (Exception $e) {
+        error_log("Error eliminando el producto: " . $e->getMessage());
         return false;
     }
 }
@@ -171,24 +177,6 @@ switch ($method) {
         } else {
             http_response_code(400);
             echo json_encode(["error" => "Producto no proporcionado"]);
-        }
-        break;
-
-    case 'DELETE':
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if (isset($data['id_equipo'])) {
-            $id_equipo = $data['id_equipo'];
-
-            if (deleteEquipoByID($id_equipo)) {
-                echo json_encode(["success" => "Equipo eliminado exitosamente"]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["error" => "Error eliminando el equipo"]);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(["error" => "ID del equipo no proporcionado"]);
         }
         break;
 
