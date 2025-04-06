@@ -1,33 +1,63 @@
 <?php
 require 'db.php';
 
+
 function getEquipos()
 {
-    try {
-        global $pdo;
+    global $conn;
 
-        $sql = "SELECT id_equipo, nombre, tipo, estado, fecha_compra, id_gimnasio FROM equipos_gimnasio WHERE id_gimnasio = 1";
-        $stmt = $pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "BEGIN :cursor := obtener_equipos_G1(); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        oci_bind_by_name($stmt, ':cursor', $cursor, -1, OCI_B_CURSOR);
+
+        oci_execute($stmt);
+        oci_execute($cursor);
+
+        $clases = [];
+        while (($row = oci_fetch_assoc($cursor)) !== false) {
+            $clases[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        oci_free_statement($cursor);
+
+        return $clases;
 
     } catch (Exception $e) {
-        error_log("Error al obtener productos: " . $e->getMessage());
-        return ["error" => "Error al obtener productos"];
+        error_log("Error al obtener equipos: " . $e->getMessage());
+        return [];
     }
 }
 
+
 function getEquipoByID($id_equipo)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_equipos_por_id(:id_equipo); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM equipos_gimnasio WHERE id_equipo = :id_equipo";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_equipo' => $id_equipo]);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_equipo", $id_equipo);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getEquipoByID: " . $e->getMessage());
         return null;
     }
 }

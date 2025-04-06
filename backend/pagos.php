@@ -4,27 +4,32 @@ require 'db.php';
 function registrarPago($id_miembro, $monto, $metodo_pago, $fecha_pago)
 {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "SELECT COUNT(*) FROM miembros WHERE id_miembro = :id_miembro";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_miembro' => $id_miembro]);
+        $sql = "SELECT COUNT(*) AS COUNT FROM miembros WHERE id_miembro = :id_miembro";
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':id_miembro', $id_miembro);
+        oci_execute($stmt);
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
 
-        if ($stmt->fetchColumn() === 0) {
+        if ($row['COUNT'] == 0) {
             return ["error" => "Miembro no encontrado"];
         }
 
-        $sql = "BEGIN registrar_pago(:id_miembro, :fecha_pago, :monto, :metodo_pago); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'id_miembro' => $id_miembro,
-            'fecha_pago' => $fecha_pago,
-            'monto' => $monto,
-            'metodo_pago' => $metodo_pago 
-        ]);
+        $sql = "BEGIN registrar_pago(:id_miembro, TO_DATE(:fecha_pago, 'YYYY-MM-DD'), :monto, :metodo_pago); END;";
+        $stmt = oci_parse($conn, $sql);
 
+        oci_bind_by_name($stmt, ':id_miembro', $id_miembro);
+        oci_bind_by_name($stmt, ':fecha_pago', $fecha_pago);
+        oci_bind_by_name($stmt, ':monto', $monto);
+        oci_bind_by_name($stmt, ':metodo_pago', $metodo_pago);
 
-        return ["success" => "Pago registrado exitosamente. Estado del miembro actualizado."];
+        
+        oci_execute($stmt);
+        oci_free_statement($stmt);
+
+        return ["success" => "Pago registrado. Estado del miembro actualizado."];
 
     } catch (Exception $e) {
         error_log("Error registrando el pago: " . $e->getMessage());
@@ -34,16 +39,29 @@ function registrarPago($id_miembro, $monto, $metodo_pago, $fecha_pago)
 
 function getPagoByID($id_pago)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_pago_por_id(:id_pago); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM pagos WHERE id_pago = :id_pago";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_pago' => $id_pago]);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_pago", $id_pago);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getPagoByID: " . $e->getMessage());
         return null;
     }
 }

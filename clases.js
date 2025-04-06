@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const registrarClaseForm = document.getElementById('registrarClaseForm');
     const selectClase = document.getElementById('selectClase');
     const formEditarClase = document.getElementById('formEditarClase');
-
+    cargarClases();
     function cargarClases(){
     fetch('/backend/clases.php')
         .then(response => response.json())

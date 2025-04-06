@@ -59,18 +59,31 @@ function getInstructores()
 }
 
 
-function getInstructorById($id)
+function getInstructorById($id_instructor)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_instructor_por_id(:id_instructor); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT id_instructor, nombre, especialidad, telefono, correo, salario FROM instructores WHERE id_instructor = :id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_instructor", $id_instructor);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
+
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
-        error_log("Error al obtener instructor: " . $e->getMessage());
+        error_log("Error en getInstructorById: " . $e->getMessage());
         return null;
     }
 }

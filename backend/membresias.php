@@ -27,18 +27,31 @@ function registrarMembresia($cedula, $costo_mensual)
     }
 }
 
-
 function getMembresiaByCedula($cedula)
 {
+    global $conn;
     try {
-        global $pdo;
-        $sql = "SELECT * FROM miembros WHERE cedula = :cedula";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
+        $sql = "BEGIN :cursor := obtener_miembro_por_cedula(:cedula); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":cedula", $cedula);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
+
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getMembresiaByCedula: " . $e->getMessage());
         return null;
     }
 }

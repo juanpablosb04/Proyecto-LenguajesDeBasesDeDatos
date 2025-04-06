@@ -4,56 +4,102 @@ require 'db.php';
 function registrarVentaTienda($cedula, $id_producto, $cantidad, $total, $fecha_venta)
 {
     try {
-        global $pdo;
+        global $conn;
 
-        $sql = "SELECT COUNT(*) FROM clientes WHERE cedula = :cedula";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['cedula' => $cedula]);
+        $sql = "SELECT COUNT(*) AS count FROM clientes WHERE cedula = :cedula";
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_execute($stmt);
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
 
-        if ($stmt->fetchColumn() === 0) {
+        if ($row['COUNT'] == 0) {
             return ["error" => "Cliente no encontrado"];
         }
 
-        $sql = "SELECT COUNT(*) FROM productos_tienda WHERE id_producto = :id_producto";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_producto' => $id_producto]);
+        $sql = "SELECT COUNT(*) AS count FROM productos_tienda WHERE id_producto = :id_producto";
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
+        oci_execute($stmt);
+        $row = oci_fetch_assoc($stmt);
+        oci_free_statement($stmt);
 
-        if ($stmt->fetchColumn() === 0) {
+        if ($row['COUNT'] == 0) {
             return ["error" => "Producto no encontrado"];
         }
 
-        $sql = "BEGIN registrar_venta(:cedula, :id_producto, :cantidad, :total, :fecha_venta); END;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'cedula' => $cedula,
-            'id_producto' => $id_producto,
-            'cantidad' => $cantidad,
-            'total' => $total,
-            'fecha_venta' => $fecha_venta
-        ]);
+        $sql = "BEGIN registrar_venta(:cedula, :id_producto, :cantidad, :total, TO_DATE(:fecha_venta, 'YYYY-MM-DD')); END;";
+        $stmt = oci_parse($conn, $sql);
+        oci_bind_by_name($stmt, ':cedula', $cedula);
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
+        oci_bind_by_name($stmt, ':cantidad', $cantidad);
+        oci_bind_by_name($stmt, ':total', $total);
+        oci_bind_by_name($stmt, ':fecha_venta', $fecha_venta);
 
+        oci_execute($stmt);
+        oci_free_statement($stmt);
 
-        return ["success" => "Venta registrada exitosamente. Stock actualizado."];
-
+        return ["success" => "Venta registrada. El Stock fue actualizado."];
     } catch (Exception $e) {
         error_log("Error registrando la venta: " . $e->getMessage());
         return ["error" => "Error registrando la venta: " . $e->getMessage()];
     }
 }
 
+
 function getVentaProductoByID($id_venta)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_venta_por_id(:id_venta); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM ventas_tienda WHERE id_venta = :id_venta";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_venta' => $id_venta]);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_venta", $id_venta);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getProductoByID: " . $e->getMessage());
         return null;
+    }
+}
+
+function calcularTotalVenta($id_producto, $cantidad)
+{
+    try {
+        global $conn;
+
+        $sql = "BEGIN :resultado := calcular_totalDeLaVenta(:id_producto, :cantidad); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        oci_bind_by_name($stmt, ':id_producto', $id_producto);
+        oci_bind_by_name($stmt, ':cantidad', $cantidad);
+        oci_bind_by_name($stmt, ':resultado', $resultado, 32);
+
+        if (!oci_execute($stmt)) {
+            $e = oci_error($stmt);
+            return ["error" => "Error al ejecutar la función: " . $e['message']];
+        }
+
+        oci_free_statement($stmt);
+
+        return ["total" => $resultado];
+
+    } catch (Exception $e) {
+        error_log("Error al calcular total de venta: " . $e->getMessage());
+        return ["error" => "Error al calcular total de venta: " . $e->getMessage()];
     }
 }
 
@@ -114,6 +160,19 @@ switch ($method) {
             } else {
                 http_response_code(404);
                 echo json_encode(["error" => "Venta no encontrada"]);
+            }
+            
+        }elseif (isset($_GET['id_producto']) && isset($_GET['cantidad'])) {
+            $id_producto = $_GET['id_producto'];
+            $cantidad = $_GET['cantidad'];
+    
+            $resultado = calcularTotalVenta($id_producto, $cantidad);
+    
+            if (isset($resultado['error'])) {
+                http_response_code(400);
+                echo json_encode(["error" => $resultado['error']]);
+            } else {
+                echo json_encode(["total" => $resultado['total']]);
             }
         }
         break;

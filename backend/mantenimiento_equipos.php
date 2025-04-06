@@ -26,16 +26,29 @@ function registrarMantenimientos_equipos($id_equipo, $fecha_mantenimiento, $desc
 
 function getMantenimientoByID($id_mantenimiento)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_mantenimiento_por_id(:id_mantenimiento); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM mantenimiento_equipos WHERE id_mantenimiento = :id_mantenimiento";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_mantenimiento' => $id_mantenimiento]);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_mantenimiento", $id_mantenimiento);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getMantenimientoByID: " . $e->getMessage());
         return null;
     }
 }

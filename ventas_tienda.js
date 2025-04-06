@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const limpiarBtn = document.getElementById('limpiarBtn');
     const eliminarBtn = document.getElementById('eliminarBtn');
     const DeleteIDInput = document.getElementById('DeleteIDInput');
+    const calcularBtn = document.getElementById('calcularBtn');
     
 
 
@@ -186,4 +187,45 @@ if (eliminarBtn && DeleteIDInput) {
 } else {
     console.error('No se encontró el campo de ID de venta o el botón de eliminar');
 }
+
+
+
+
+if (calcularBtn) {
+    calcularBtn.addEventListener('click', function () {
+        const idProductoInput = document.getElementById('id_producto');
+        const cantidadInput = document.getElementById('cantidad');
+
+        const id_producto = idProductoInput.value;
+        const cantidad = cantidadInput.value;
+
+        if (id_producto && cantidad) {
+            fetch(`/backend/ventas_tienda.php?id_producto=${id_producto}&cantidad=${cantidad}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la solicitud');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Total a pagar:', data);
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById('total').value = parseFloat(data.total);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la solicitud fetch:', error);
+                    alert('Ocurrió un error al calcular el total');
+                });
+
+        } else {
+            alert('Por favor, ingrese el ID del producto y la cantidad');
+        }
+    });
+} else {
+    console.error('No se encontró el botón calcular');
+}
+
 });

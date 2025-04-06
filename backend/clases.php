@@ -27,33 +27,59 @@ function registrarClase($nombre_clase, $descripcion, $id_instructor)
 
 function getClaseById($id)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_clase_por_id(:id); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT id_clase, nombre_clase, descripcion, id_instructor FROM clases WHERE id_clase = :id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id", $id);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
+
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
-        error_log("Error al obtener clase: " . $e->getMessage());
+        error_log("Error en getClaseById: " . $e->getMessage());
         return null;
     }
 }
 
 function getClases()
 {
-    try {
-        global $pdo;
+    global $conn;
 
-        $sql = "SELECT id_clase, nombre_clase, descripcion, id_instructor FROM clases";
-        $stmt = $pdo->query($sql);
-        $clases = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "BEGIN :cursor := obtener_clases(); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        oci_bind_by_name($stmt, ':cursor', $cursor, -1, OCI_B_CURSOR);
+
+        oci_execute($stmt);
+        oci_execute($cursor);
+
+        $clases = [];
+        while (($row = oci_fetch_assoc($cursor)) !== false) {
+            $clases[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        oci_free_statement($cursor);
 
         return $clases;
 
     } catch (Exception $e) {
-        error_log("Error al obtener instructores: " . $e->getMessage());
+        error_log("Error al obtener clases: " . $e->getMessage());
         return [];
     }
 }

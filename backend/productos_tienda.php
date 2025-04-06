@@ -25,31 +25,60 @@ function ProductoRegistry($nombre_producto, $precio, $stock, $tipo_producto) {
 
 function getProductos()
 {
-    try {
-        global $pdo;
+    global $conn;
 
-        $sql = "SELECT id_producto, nombre_producto, precio, stock, tipo_producto FROM productos_tienda";
-        $stmt = $pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "BEGIN :cursor := obtener_productos(); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        oci_bind_by_name($stmt, ':cursor', $cursor, -1, OCI_B_CURSOR);
+
+        oci_execute($stmt);
+        oci_execute($cursor);
+
+        $clases = [];
+        while (($row = oci_fetch_assoc($cursor)) !== false) {
+            $clases[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        oci_free_statement($cursor);
+
+        return $clases;
 
     } catch (Exception $e) {
         error_log("Error al obtener productos: " . $e->getMessage());
-        return ["error" => "Error al obtener productos"];
+        return [];
     }
 }
 
+
 function getProductoByID($id_producto)
 {
+    global $conn;
     try {
-        global $pdo;
+        $sql = "BEGIN :cursor := obtener_producto_por_id(:id_producto); END;";
+        $stmt = oci_parse($conn, $sql);
 
-        $sql = "SELECT * FROM productos_tienda WHERE id_producto = :id_producto";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_producto' => $id_producto]);
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_producto", $id_producto);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
 
     } catch (Exception $e) {
+        error_log("Error en getProductoByID: " . $e->getMessage());
         return null;
     }
 }
