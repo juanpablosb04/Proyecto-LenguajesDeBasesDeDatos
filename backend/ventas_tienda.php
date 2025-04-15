@@ -76,6 +76,64 @@ function getVentaProductoByID($id_venta)
     }
 }
 
+function getProductos()
+{
+    global $conn;
+    try {
+        $sql = "BEGIN :cursor := obtener_producto_nombre(); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        oci_bind_by_name($stmt, ':cursor', $cursor, -1, OCI_B_CURSOR);
+
+        oci_execute($stmt);
+        oci_execute($cursor);
+
+        $productos = [];
+        while (($row = oci_fetch_assoc($cursor)) !== false) {
+            $productos[] = $row;
+        }
+
+        oci_free_statement($stmt);
+        oci_free_statement($cursor);
+
+        return $productos;
+
+    } catch (Exception $e) {
+        error_log("Error al obtener productos: " . $e->getMessage());
+        return [];
+    }
+}
+
+function getProductoByID($id_producto)
+{
+    global $conn;
+    try {
+        $sql = "BEGIN :cursor := obtener_producto_por_id(:id_producto); END;";
+        $stmt = oci_parse($conn, $sql);
+
+        $cursor = oci_new_cursor($conn);
+        
+        oci_bind_by_name($stmt, ":id_producto", $id_producto);
+        oci_bind_by_name($stmt, ":cursor", $cursor, -1, OCI_B_CURSOR);
+        
+        oci_execute($stmt);
+
+        oci_execute($cursor);
+        $result = oci_fetch_assoc($cursor);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
+
+    } catch (Exception $e) {
+        error_log("Error en getProductoByID: " . $e->getMessage());
+        return null;
+    }
+}
+
 function calcularTotalVenta($id_producto, $cantidad)
 {
     try {
@@ -154,7 +212,7 @@ switch ($method) {
         if (isset($_GET['id_venta'])) {
             $id_venta = $_GET['id_venta'];
             $venta = getVentaProductoByID($id_venta);
-
+    
             if ($venta) {
                 echo json_encode($venta);
             } else {
@@ -162,7 +220,7 @@ switch ($method) {
                 echo json_encode(["error" => "Venta no encontrada"]);
             }
             
-        }elseif (isset($_GET['id_producto']) && isset($_GET['cantidad'])) {
+        } elseif (isset($_GET['id_producto']) && isset($_GET['cantidad'])) {
             $id_producto = $_GET['id_producto'];
             $cantidad = $_GET['cantidad'];
     
@@ -173,6 +231,19 @@ switch ($method) {
                 echo json_encode(["error" => $resultado['error']]);
             } else {
                 echo json_encode(["total" => $resultado['total']]);
+            }
+        } elseif (isset($_GET['action']) && $_GET['action'] == 'getProductos') {
+            $productos = getProductos();
+            echo json_encode($productos);
+        }elseif (isset($_GET['id_producto'])) {
+            $id_producto = $_GET['id_producto'];
+            $producto = getProductoByID($id_producto);
+            
+            if ($producto) {
+                echo json_encode($producto);
+            } else {
+                http_response_code(404);
+                echo json_encode(["error" => "Producto no encontrado"]);
             }
         }
         break;

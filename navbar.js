@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const navbar = `
-  <nav class="bg-[#242424] p-4">
+  <nav class="bg-[#242424] p-4 border-b-[2px] border-[#ff6600]"">
       <div class="max-w-screen-xl mx-auto flex justify-between items-center">
         <div class="text-white text-xl font-bold">
           <a href="/inicio.html">Gym-Nordico</a>

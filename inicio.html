@@ -7,29 +7,41 @@
   <link rel="stylesheet" href="/estilos/inicio.css"> 
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-  
+<body class="bg-[url('/fondos/fondoInicio.jpg')] bg-cover bg-center bg-no-repeat">
+
   <div id="navbar-container"></div>
   <script src="navbar.js"></script>
 
   <div class="min-h-screen flex items-center justify-center p-6">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl flex space-x-8">
-      
-      <div class="flex items-center p-4 border rounded-lg">
-        <img src="/fondos/inicio.jpg" alt="Descripción de la imagen" class="w-2/4 h-auto mr-4">
-        <div>
-          <h2 class="text-xl font-semibold p-8">Bienvenido al sistema de Gym-Nordico
-          </h2>
-          <p class="text-gray-600 p-8" >Este es el centro donde gestionamos todo lo relacionado con nuestros miembros, clases y servicios. Asegúrate de mantener los datos actualizados y brindar un excelente servicio a cada uno de nuestros clientes. Si necesitas asistencia, no dudes en consultar las guías del sistema o comunicarte con el equipo de soporte.
 
-            Recuerda, la misión de Gym-Nordico es ofrecer un ambiente de bienestar y superación personal, y tu rol es clave para lograrlo. ¡Gracias por ser parte de este gran equipo!</p>
-        </div>
+
+    <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-lg w-full max-w-5xl p-8 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
+
       
-      <div class="flex-1">
+      <img src="/fondos/inicio.jpg" alt="Descripción de la imagen" class="w-full md:w-1/2 rounded-lg shadow-md object-cover">
+
+      
+      <div class="text-white">
+        <h2 class="text-2xl font-bold mb-4">Bienvenido al sistema de Gym-Nordico</h2>
+        <p class="text-base leading-relaxed">
+          Este es el centro desde donde gestionamos integralmente todo lo relacionado con nuestros miembros, las clases, los entrenadores, los equipos y los servicios que ofrecemos. 
+          Es fundamental mantener toda la información del sistema actualizada y organizada, ya que esto nos permite brindar un servicio eficiente, personalizado y de alta calidad a 
+          cada uno de nuestros clientes. Cada dato que ingresas y cada tarea que realizas contribuye directamente a la experiencia de quienes confían en nosotros para alcanzar sus metas 
+          de salud y bienestar.</p>
+          
+        <p class="text-base leading-relaxed">Nuestro objetivo es que todos los usuarios del sistema puedan desenvolverse con claridad y confianza, por eso, si en algún momento necesitas ayuda, no dudes en consultar 
+          las guías internas o comunicarte directamente con el equipo de soporte técnico. Estamos aquí para acompañarte en cada paso. </p>
+          
+        <p class="text-base leading-relaxed">Recuerda siempre que la misión de Gym-Nordico va mucho más allá del entrenamiento físico: buscamos generar un entorno que promueva el bienestar integral, la disciplina, 
+          la motivación y la superación personal. Tú, como parte esencial de este sistema, juegas un papel clave para que eso sea posible. Agradecemos tu compromiso y profesionalismo. 
+          ¡Gracias por ser parte de este gran equipo que trabaja con pasión y dedicación cada día!</p>
+          
         
       </div>
+
     </div>
   </div>
 
 </body>
+
 </html>

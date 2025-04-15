@@ -7,7 +7,59 @@ document.addEventListener('DOMContentLoaded', function () {
     const DeleteIDInput = document.getElementById('DeleteIDInput');
     const calcularBtn = document.getElementById('calcularBtn');
     
+    cargarProductos()
+    
+    function cargarProductos() {
+        fetch('/backend/ventas_tienda.php?action=getProductos')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const selectProducto = document.getElementById('selectProducto');
+                selectProducto.innerHTML = '<option value="">Seleccione un producto...</option>';
+                
+                data.forEach(producto => {
+                    const option = document.createElement('option');
+                    option.value = producto.ID_PRODUCTO;
+                    option.textContent = producto.NOMBRE_PRODUCTO;
+                    selectProducto.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar productos:', error);
+                const selectProducto = document.getElementById('selectProducto');
+                selectProducto.innerHTML = '<option value="">Error al cargar productos</option>';
+            });
+    }
 
+const selectProducto = document.getElementById('selectProducto');
+
+selectProducto.addEventListener('change', function() {
+    const productoId = this.value;
+
+    if (productoId) {
+        fetch(`/backend/ventas_tienda.php?id_producto=${productoId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    document.getElementById('id_producto').value = data.ID_PRODUCTO;
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener detalles del producto:', error);
+            });
+    } else {
+        document.getElementById('id_producto').value = '';
+    }
+});
 
 document.getElementById('registroForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -68,6 +120,7 @@ if (consultarBtn && GetIDInput) {
                         document.getElementById('Getcantidad').value = data.CANTIDAD || '';
                         document.getElementById('Gettotal').value = data.TOTAL || '';
                         document.getElementById('Getfecha_venta').value = data.FECHA_VENTA || '';
+                        document.getElementById('Getnombre_producto').value = data.NOMBRE_PRODUCTO || '';
 
 
                         document.getElementById('Getcedula').removeAttribute('disabled');

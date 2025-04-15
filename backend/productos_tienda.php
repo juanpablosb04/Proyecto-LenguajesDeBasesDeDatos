@@ -53,7 +53,6 @@ function getProductos()
     }
 }
 
-
 function getProductoByID($id_producto)
 {
     global $conn;
