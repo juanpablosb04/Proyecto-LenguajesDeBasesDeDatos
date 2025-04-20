@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     alert(data.success);
                     cargarClases();
+                    limpiarBtn.click();
                 } else {
                     alert(data.error);
                 }
@@ -93,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     
             limpiarBtn.classList.add('hidden');
+            eliminarBtn.classList.add('hidden');
             selectClase.selectedIndex = 0;
     
         });

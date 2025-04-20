@@ -1,36 +1,36 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     const form = document.getElementById('loginForm');
     const loginError = document.getElementById('login-error');
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const email = document.getElementById('email').value.trim();
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
-        if (!email || !password) {
+        if (!username || !password) {
             loginError.style.display = 'block';
             loginError.textContent = 'Por favor, llena todos los campos.';
             return;
         }
 
         try {
-            
             const response = await fetch('backend/login.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({ email, password }),
+                body: new URLSearchParams({ 
+                    username,
+                    password 
+                }),
             });
 
             const result = await response.json();
 
             if (response.ok) {
-                
                 localStorage.setItem('userLoggedIn', 'true');
-                window.location.href ='inicio.html';
+                window.location.href = 'inicio.html';
             } else {
                 loginError.style.display = 'block';
                 loginError.textContent = result.error || 'Usuario o contraseña incorrectos.';
@@ -42,14 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-
-
     const logoutButtons = document.getElementById('logout-buttons');
     const authButtons = document.getElementById('auth-buttons');
 
     if (logoutButtons && authButtons) {
-       
         if (localStorage.getItem('userLoggedIn') === 'true') {
             logoutButtons.style.display = 'block';
             authButtons.querySelectorAll('.btn-outline-light, .btn-register').forEach(button => {
@@ -62,5 +58,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-
 });

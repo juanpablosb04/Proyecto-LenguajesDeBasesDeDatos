@@ -6,14 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
           <a href="/inicio.html">Gym-Nordico</a>
         </div>
         <div class="space-x-4 relative">
-          <a href="/clientes.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clientes</a>
-          <a href="/membresias.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Membresias</a>
-          <a href="/instructores.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Entrenadores</a>
-          <a href="/clases.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Clases</a>
-          <a href="/productos.html" class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition">Productos</a>
+          <a href="/clientes.html" class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition">Clientes</a>
+          <a href="/membresias.html" class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition">Membresias</a>
+          <a href="/instructores.html" class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition">Entrenadores</a>
+          <a href="/clases.html" class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition">Clases</a>
+          <a href="/productos.html" class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition">Productos</a>
           
           <div class="relative inline-block">
-            <button class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition" id="equiposButton">
+            <button class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition" id="equiposButton">
               Equipos
           </button>
           <div id="equiposDropdown" class="hidden absolute bg-white shadow-lg rounded-md mt-2 w-40">
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
 
           <div class="relative inline-block">
-              <button class="text-white hover:bg-blue-500 px-4 py-2 rounded-md transition" id="ventasButton">
+              <button class="text-white hover:bg-[#ff6600] px-4 py-2 rounded-md transition" id="ventasButton">
                   Ventas
               </button>
               <div id="ventasDropdown" class="hidden absolute bg-white shadow-lg rounded-md mt-2 w-40">
